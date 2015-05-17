@@ -1,0 +1,1582 @@
+
+
+\documentclass[a4paper,doc,natbib,floatsintext]{apa6}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{pdfpages}
+\usepackage{Sweave}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{eurosym}
+%\SweaveOpts{concordance=TRUE}
+
+\graphicspath{{articles/article1/}}
+
+\title{Peeks and Keeps: A new paradigm to study the exploration-exploitation trade-off}
+\shorttitle{peeks and keeps}
+\author{Nathaniel D. Phillips}
+\affiliation{University of Konstanz}
+
+\abstract{Many important decision tasks involve an exploration-exploitation trade-off, where organisms have the competing goals of gaining new information (exploration) to improve future decisions, and acting on existing information (exploitation). The most common paradigm to study this trade-off experimentally is the n-armed bandit, where decision makers reap real costs and rewards on every trial. We suggest that, unlike the n-armed bandit, many real world tasks allow decision makers to explore options (such as stock price changes) without reaping any costs or rewards. To address this, we introduce a new experimental paradigm called ``Peeks and Keeps'' that combines apects of the n-armed bandit with the 'bet-observe' task (cite Tversky). Unlike the n-armed bandit, Peeks and Keeps gives decision makers the option of explicitly separating exploration and exploitation behavior, where exploration provides only information but no costs or rewards, and exploitation gives both information and costs and rewards. This paradigm not only increases the empirical validity of the n-armed bandit, but also provides researchers with an explicit measure of exploration that is hidden in other paradigms.}
+
+\keywords{decisions from experience, learning, information search, exploration-exploitation, foraging}
+
+\begin{document}
+
+
+% (purely) epistemic vs. pragmatic
+% theoretical vs. practical
+% no consequence vs. consequence
+
+
+\maketitle
+
+\section{Exploration-exploitation trade-off}
+
+Many of the most important real world decisions require individuals to reap consequences from several risky options that probabilistically give rewards and punishments. In many tasks, these decisions are made under uncertainty, where the probabilities and magnitudes associated with options are \textit{a priori} unknown. In order to learn about options, organisms can engage in active search which improves the quality of their impressions of options. However, search can come at a cost, such as the missed opportunity to receive rewards from known options. For example, in trying a new restaurant, one forgoes the opportunity to have a meal at her (current) favorite restaurant.
+
+This conflict between obtaining new information and acting on existing information is known as the exploration-exploitation trade-off. The exploration-exploitation (EE) trade-off is one of the most widely studied aspects of decision making from human to non-human organisms. The exploration-exploitation trade-off represents a goal conflict in decisions under uncertainty, where an organism is trying to maximize its long term rewards from \textit{a priori} unknown options. On the one hand, individuals want to explore options by gaining as much information as possible to improve the quality of their future decisions. On the other hand, they want to \textit{exploit} options by acting on existing information in order to increase short-term rewards.
+
+One of the most widely used experimental tasks used to study the exploration-exploitation conflict is the n-armed bandit. In an n-armed bandit, participants have a fixed number of trials to select an opion and experience a consequential reward.
+
+
+
+\subsection{Purely epistemic versus pragmatic actions}
+
+\begin{itemize}
+
+  \item \cite{neth2008thinking} distinguished between two types of actions, epistemic and pragmatic. Epistemic actions are those that result in information rather than punishments or rewards, while pragmatic actions are those that lead to punishments or rewards. Exploration is assumed to be an epistemic action while exploitation is a pragmatic action.
+  
+  \item One can easily imagine real-world cases where people explicitly engage in purely epistemic actions. For example, imagine a person who wishes to learn about the stock market prior to risking any real money. He can do this by viewing sequential returns from several stocks and observing their risk. Alternatively, a new resident to a town can learn about local restaurants by asking her neighbors about their recent experiences. In all of these cases, the actor is learning about options without reaping consequences.
+  
+  \item Clearly these purely epistemic actions are both psychologically and behaviorally distinct from pragmatic actions, where one obtains \textit{both} information and immediate consequences. For example, our stock invester who starts investing his money into stocks will then not only learn about their performance, but also reap gains and suffer consequences. Similarly, the new town resident who starts frequenting local restaurants will continue learning about them but also experience immediate pragmatic outcomes.
+  
+  \item Somewhat puzzlingly, paradigms that have been used to study exploration-exploitation trade-off in humans has largely ignored behavioral differences in epistimic and pragmatic actions. In the N-armed bandit task, players are only allowed to engage in one type of behavior - choice, which always provides both epistemic and pragmatic rewards. Players are not given the option to engage in purely epistemic actions. 
+  
+  \item This can lead to erroenous inferences. The same choice behavior could be interpreted as either resulting from an epistemic or pragmatic motivation. Until now, researchers have had to use computational cognitive modeling techniques to attribute choices post-hoc to either an epistemic or pragmatic underlying goal.
+  
+  \item We believe a new paradigm is needed. One where individuals have the option to explicitly explore or exploit options. This task will not only be a better model of many real-world decision tasks than previous paradigms, but will also allow researchers to explicitly observe behavior consistent with purely epistemic goals.
+
+\end{itemize}
+
+\subsection{Combining three paradigms}
+
+
+\begin{center}
+    \begin{tabular}{ | l | l | l | l | l |}
+    \hline
+    Paradigm & EE Tradeoff & Pure Exploration & Pure Exploitation & Alternation \\ \hline
+    N-Armed Bandit & Yes & No & No & Yes\\ \hline
+    Sampling Paradigm & No & Yes & Yes & No\\ \hline
+    Bet-Observe & Yes & Yes & Yes & Yes\\ \hline
+    Peeks and Keeps & Yes & Yes & No & Yes\\ \hline
+    \hline
+    \end{tabular}
+\end{center}
+
+
+In a multi-armed bandit task, participants choose between multiple a priori unknown options over several trials and receive rewards (or costs) on each trial. Because decision makers reap consequences on every trial, the n-armed bandit task does not allow purely episemic actions. The Iowa Gambling Task (IGT) is one famous example of this paradigm. Using cognitive models such as the expectancy-valence model, researchers have used the IGT to study cognitive mechanisms such as loss-aversion, recency, and choice consistency in both healthy and non-healthy individuals (Yechiam et al., 2005).
+
+Two paradigms have been used to study purely epistemic actions: the sampling paradigm of decisions from experience \citep{hertwig2004decisions} and the bet-observe task \citep{tversky1966information}. Like the n-armed bandit task, both paradigms present participants with multiple, a priori unknown options. In the sampling paradigm, participants can then sample from options, without consequence, as many times as they would like before making a single consequential choice. Here, participants engage in a self-determiend number of purely epistemic actions stringly prior to a single purely pragmatic action. After making their final choice, participants receive the consequences from their choice but cannot continue to observe. Thus, in the sampling paradigm observion strictly occurs prior to exploitation with no possibility to alternate between the two modes.
+
+As far as we know, the bet-observe task is the only paradigm that allows individuals to alternate between pure exploration and pure exploitation. In the bet-observe task, an individual is presented with two options. On each of M trials, one of the two options will produce a reward indicated by a green light. On each trial, the participant selects an option and makes one of two choices. He can *observe* an option, see which one produces the reward, but not receive the reward. Or he can *bet* on an option. If the player bets on an option, he will gain its underlying reward but will not see whether the reward is present. Because the participant only sees the option outcome if he observes, he can only learn about the options' underlying distributions on observation trials, but can only reap rewards on betting trials.
+
+Navarro and Newell (2014) derived optimal decision strategies for two versions of the game: stationary and nonstationary. In the stationary version of the game, the reward probability distributions are fixed. Specifically, the probability that the left option has a reward $l_{p}$ is fixed and does not change over time. In the stationary task, an optimal learner will begin the task by observing outcomes until he reaches a pre-defined information threshold. Once he reaches this threshold, he will switch to a betting strategy and will always bet on the perceived better option. In the nonstationary version of the game, the reward probability distributions can change at any time. For example, with some probability $\alpha$ the probability $l_{p}$ could change to a value drawn from a uniform distribution. In this version of the game, the optimal decision strategy alternates between observering and betting throughout the game. In other words, the actor will begin by observing for a few trials until a certain information threshold is reached, then he will switch to betting for a few trials. He will then switch to observing in order to see if $l_{p}$ has changed.
+
+However, because betting in the bet-observe task does not provide information, decision makers cannot learn anything on betting trials. This is not an inherent flaw in the paradigm - indeed, obscuring information from betting trials elegantly separates epistemic from pragmatic actions. However, because many, if not most, real-world decision tasks provide information on both exploration and exploitation trials, the bet-observe task is a poor model of most real-world decisions. From food choice to mate choice, explitation decisions (i.e.; consuming food or selecting a mate) will always provide information to the decision maker that it can use to update its impressions and guide future search. 
+
+In order to study how people alternate between explicit exploration and exploitation, we introduce the Peeks and Keeps task.
+
+
+\section{Peeks and Keeps}
+
+Peeks and Keeps is an extension of an N-armed bandit task that explicitly separates exploration and exploitation decisions. In the task, participants repeatedly select one of N options with *a priori* unknown underlying probability distributions over the course of M trials. On each trial, the participant selects an option and elects to either *observe* the next outcome without financial feedback, or *bet* on the outcome and receive the financial feedback. At the end of M trials, the participant is paid the sum of all sample outcomes revealed on bet trials. If he always observes and never bets, he receives no bonus. If he bets on every trial, he receives the sum total of all samples.
+
+\subsection{Decision Strategies}
+
+We split cognitive strategies in Peeks and Keeps into three distinct processes: Selection, Action, and Update. The selection process determines which option players interact with, the action process determines whether a player decides to peek or keep, and the updating process dictates how a player updates his or her impressions of that option after the action.
+
+The specific order of these processes depends on the overarching search model. In the "SAU" Model, we assume that decision makers process information in the order "Selection-Action-Update." In the "ASU" model, we assume that they process information in the order "Action-Selection-Update."
+
+\subsection{SAU}
+
+\subsubsection{Selection}
+
+We follow prior research in assuming that people use a soft-max selection rule, where the probability that an option is selected is determined by the current expectation of that option relative to the sum of the expectations of all options. Formally:
+
+\begin{center}
+\begin{equation}
+
+Pr[G_{j}(t+1)]=\frac{e^{\theta(t) \times E_{j}(t)}}{\sum_{k}e^{\theta(t) \times E_{k}(t)}}
+
+\end{equation}
+\end{center}
+
+The term $\theta(t)$ governs how sensitive people are to expectations in directing their selection. We follow previous researchers \citep{yechiam2005models} in setting $\theta(t)$ to be a function of time and a response-sensitivity parameter c:
+
+\begin{center}
+\begin{equation}
+\label{eq:thetat}
+
+\theta(t) = (\frac{t}{n_{t}})^{c}
+
+\end{equation}
+\end{center}
+
+where c has a support of [0, Inf]. As c increases, people are more likely to select the option with the highest expectation. Small values of c indicate larger degrees of exploration, while large values of c indicate less exploration.
+
+Importantly, because equation \ref{eq:thetat} is a monotonically increasing function of trials, participants are assumed to be increasingly more likely to select options with higher expectations as trials increase.
+
+\subsubsection{Action}
+
+Once an option is selected, the decision maker decides whether to peek or keep. Because both peeking and keeping provide identical information, the decision to peek or keep should be a function of one's expectations of the option's outcomes. For example, if the option is believed to only produce positive outcomes, then one should always keep. On the other hand, if one believes that the option has a high probability of producing a negative outcome, or even a low probability of producing a high magnitude negative outcome, then one may decide to avoid the risk of keeping and decide to peek.
+
+Because both the perceived probability of a negative outcome, and the expectation of an option could dictate actions, we developed two potential action functions. We assume that an individual will use one of these functions and not both.
+
+\subsubsubsection{Probability of a negative outcome}
+
+The first action function predicts that people will keep an option as a decreasing function of the perceived probability that the next outcome will be negative:
+
+\begin{center}
+\begin{equation}
+\label{eq:actionpneg}
+
+Pr(Keep_{t})= 1 - e^{N_{j} \times \frac{1}{N_{tol}}
+
+\end{equation}
+\end{center}
+
+The sensitivity of the function to the perceived probability of a negative outcome is given by the negativity tolerange parameter $N_{tol}$. The larger $N_{tol}$ is, the more tolerant people are of negative outcomes and the more likely they are to keep. The smaller $N_{tol}$ is, the less tolerant peopel are of negative outcomes and the less likely they are to keep.
+
+\subsubsubsection{Expectations}
+
+The second action function predicts that people will keep an option as an increasing function of the expections of options. When expectations are negative, the probability of keeping will always be less than 0.50 and when expectations are positive the probability will be greater than 0.50:
+
+\begin{center}
+\begin{equation}
+\label{eq:actionexpectation}
+
+Pr(Keep_{t})= \frac{1}{1 + e^{-E_{j} \times \gamma}}
+
+\end{equation}
+\end{center}
+
+Equation \ref{eq:actionexpectation} contains a sensivitiy parameter $\gamma$ which dictates how sensitive people are to current expectations in deciding which action to take. As $\gamma$ increases, participants are more likely to keep an option with a positive expectation, and peek at an option with a negative expectation.
+
+\subsection{Updating}
+
+After an option has been selected and acted upon, the decision maker updates her expectations of the selected option. We follow previous research \citep{yechiam2005models} and assume that expectationa are updated as a function of prior expectations and the newly observed value:
+
+\begin{center}
+\begin{equation}
+\label{eq:updating}
+
+E_{j}(t)=E_{j}(t-1)+\alpha \times [v(t) - E_{j}(t-1)]
+
+\end{equation}
+\end{center}
+
+where $\alpha$ is the updating parameter with a support of [0, 1]. When $\alpha$ is close to 0, expectations do not change much after each obsevation. When $\alpha$ is close to 1, expectations are strongly influenced by recent outcomes.
+
+We leave open the possibility for different values of $\alpha$ for different actions. For example, one could have a large recency effect and fast updating for keep actions, and low recency effects and slow updating for peek actions. We will test these assumptions in our data.
+
+\subsection{Action-Selection-Updating Model}
+
+
+The ASU model assumes that people can be in one of two mutually exclusive action states: exploration or exploitation. When people are in an exploration state, they only peek and when they are in an exploitation state they only keep. The probability that people are in an exploration state depends on the current trial and the time since their previous exploration state. We assume that people are more likely to be in an exploration state on earlier trials than later trials, and that people are increasingly more likely to be in an exploitation state the longer it has been since their last exploitation state.
+
+Formally, we define the probability of being in an exploration state as follows. Let $S(t)$ be the state of the decision maker on trial t, where $S(t) \epsilon (0, 1)$ Additionally, let $\beta$ be the number of trials since the last state change.
+
+If the decision maker is in state 1 on trial t - 1, then the probability that he will switch to an exploration state 0 on trial (t) is giving by
+
+\begin{center}
+\begin{equation}
+\label{eq:modeswitch}
+
+Pr(S(t)=0|S(t-1) = 1)= \frac{1}{1 + e^{-t \times \gamma - \beta}}
+
+\end{equation}
+\end{center}
+
+where t is the current trial number, $\beta$ is the number of trials since the previous observation state. 
+
+<<echo = F>>=
+
+switch.to.explore.fun <- function(
+                                  trial, # Current trial
+                                  gamma = 1, # Bias towards exploitation state
+                                  beta = 1, # Trials since previous exploitation state
+                                  n.trials = 100, # Total Trials,
+                                  kink = 50
+                                  
+                                  ) {
+  
+  return(1 / (1 + exp(-((beta + trial - kink) / n.trials * gamma))))
+  
+}
+
+
+plot(5:100, ylim = c(0, 1), type = "n")
+
+for (i in 1:8) {
+
+lines(1:100, switch.to.explore.fun(1:100, beta = i, gamma = 4, kink = 40), lwd = i)
+  
+  }
+
+
+
+
+@
+
+
+
+
+If you are currently in an exploration state on trial (t-1), then the probability you will switch to an exploitation state on trial (t) is giving by
+
+\begin{center}
+\begin{equation}
+\label{eq:modeswitch2}
+
+Pr(State=Exploit{t} | Previous state is explore)= 1-\frac{1}{1 + e^{-runs \times \gamma}}
+
+\end{equation}
+\end{center}
+
+
+
+<<echo = F, eval = F>>=
+
+
+# Option selection function
+
+selection.fun <- function(exp.vec = rnorm(5),
+                       pars = .3,
+                       method = "sm",
+                       trial = 10,
+                       n.trials = 20
+                       ) {
+  
+  n.j <- length(exp.vec)
+  
+  if(method == "eg") {
+    
+    epsilon <- pars[1]
+    
+    if(sd(exp.vec) == 0) {select.probs <- rep(1 / n.j, n.j)}
+    
+    if(sd(exp.vec) > 0) {
+    
+    current.best <- which(exp.vec == max(exp.vec))
+    
+    if(length(current.best) > 1) {current.best <- current.best[sample(1:length(current.best), 1, rep(1 / length(current.best)))]}
+    
+    select.probs <- rep(NA, n.j)
+    select.probs[current.best] <- 1 - epsilon
+    select.probs[-current.best] <- (epsilon / (n.j - 1))
+    }
+    
+  }
+  
+  if(method == "sm") {
+    
+    choice.sens <- pars[1]
+    
+    select.probs <- exp((trial / n.trials) * choice.sens ^ 2 * exp.vec) / sum(exp((trial / n.trials) * choice.sens ^ 2 * exp.vec))
+    
+  }
+  
+  return(select.probs)
+  
+  
+}
+
+
+
+# Action (observe or bet) function
+
+action.fun <- function(exp.vec = c(1, 2),
+                       pneg.vec = c(.2, .4),
+                       selection = 1,
+                       trial = 10,
+                       n.trials = 100,
+                       pars = c(1, 2),
+                       method = "pneg" # which method? [trial, pneg, exp]
+                       ) {
+  
+  
+  if(method == "trial") {
+      
+      keep.bias <- pars[1]
+      
+    keep.p <- 1 / (1 + exp(-(trial / n.trials + keep.bias)))
+    keep.p.vec <- rep(keep.p, length(exp.vec))
+    
+  }
+  
+  if(method == "pneg") {
+    
+    pneg.tol <- pars[1]
+    
+    keep.p.vec <- exp(-pneg.vec * (1 / pneg.tol))
+
+    
+  }
+  
+    if(method == "exp") {
+      
+      keep.bias <- pars[1]
+      exp.sens <- pars[2]
+
+      
+    keep.p.vec <- 1 / (1 + exp(-(exp.vec * exp.sens + keep.bias)))
+
+    
+  }
+  
+
+  return(keep.p.vec)
+}
+
+
+
+# Expectation and uncertainty updating function
+
+update.fun <- function(
+                       selection = 1,
+                       action = 1,
+                       outcome = 0, 
+                       prior.exp = c(1, 2), 
+                       prior.pneg = c(.2, .7),
+                       pars = c(.5, .5)
+                       ) {
+  
+  theta.peek <- pars[1]
+  theta.keep <- pars[2]
+  
+   
+  new.exp <- prior.exp
+  new.pneg <- prior.pneg
+ 
+  
+  
+  if(action == 0) {
+  
+  new.exp[selection] <- prior.exp[selection] + theta.peek * (outcome - prior.exp[selection])
+  new.pneg[selection] <- prior.pneg[selection] * (1 - theta.peek) + (outcome < 0 ) * theta.peek
+  
+  }
+  
+    if(action == 1) {
+  
+  new.exp[selection] <- prior.exp[selection] + theta.keep * (outcome - prior.exp[selection])
+  new.pneg[selection] <- prior.pneg[selection] * (1 - theta.keep) + (outcome < 0 ) * theta.keep
+  
+  }
+  
+  return(list(new.exp, new.pneg))
+  
+}
+
+
+
+
+## Plot single simulation result
+
+plot.kg.sim <- function(df,
+                        gamble.pdf = NA,
+                        col.vec = c("#D7D7D7", "#F3AEAF", "#9ED9BF", "#5CCBEB", "#DEEB61", "#AEADB0", "#F2F2F2"),
+                        true.means = NA,
+                        exp.lines = T,
+                        show.values = T,
+                        plot.lag = 10,
+                        show.true.means = T
+                        ) {
+  
+  n.options <- length(grep("exp", names(df)))
+  max.trials <- max(df$trial)
+  cum.rewards <- cumsum(df$reward)
+  
+  max.reward <- max(cum.rewards)
+  max.exp <- max(unlist(df[paste("exp.", 1:n.options, sep = "")]))
+  min.exp <- min(unlist(df[paste("exp.", 1:n.options, sep = "")]))
+  
+
+    
+    layout(matrix(c(1, 1, 1, 2, 3, 4), nrow = 2, ncol = 3, byrow = T), widths = c(2, 2, 2), heights = c(3, 3))
+    
+  
+  
+  # Main Plot
+  {
+  par(mar = c(5, 4, 4, 5))
+  
+plot(1, xlim = c(0, max.trials), ylim = c(min.exp, max.exp), xlab = "Trial", ylab = "Expectation", type = "n")  
+
+  
+      
+      
+      
+  # True Mean Lines
+  
+  if(show.true.means) {
+    
+    true.means <- unlist(lapply(1:length(gamble.pdf), function(x) {mean(gamble.pdf[[x]])}))
+    
+    abline(h = true.means, col = col.vec[1:n.options], lwd = .5)
+    segments(rep(-10, 2), true.means, rep(0, 2), true.means, lwd = 4, col = col.vec[1:n.options])
+    
+  }
+  
+  
+    ## Expectation lines
+  if(exp.lines == T) {
+  
+  for(i in 1:n.options) {
+    
+    exp.i <- df[,grep(paste("exp.", i, sep = ""), names(df))]
+    
+    lines(df$trial, exp.i, col = col.vec[i], lwd = 2)
+    
+    
+  }
+  }
+    
+ 
+  
+  
+  
+  ## Add cumulative reward line and points
+  par(new = T)
+  
+  ymin <- min(min(cum.rewards), -5)
+  ymax <- max(10, max(cum.rewards))
+  
+  
+  plot(1, xlim = c(0, max.trials), ylim = c(ymin, ymax), xlab = "", ylab = "", xaxt = "n", type = "n", bty = "n", yaxt = "n")
+  
+  
+    
+  abline(h = 0, col = gray(.5), lty = 2)
+  
+  axis(4, las = 1)
+  mtext("Cumulative Reward", 4, line = 3)
+  
+  
+  lines(df$trial, cum.rewards)
+  
+  if(sum(df$action == 0) > 0) {
+  
+  points(df$trial[df$action == 0], 
+         cum.rewards[df$action == 0], pch = 21, bg = gray(.9), 
+         cex = 2.5, col = unlist(lapply(1:length(df$selection[df$action == 0]), function(x) {col.vec[df$selection[df$action == 0][x]]})),
+         lwd = 2
+         )
+    
+  }
+  
+    if(sum(df$action == 1) > 0) {
+      
+  points(df$trial[df$action == 1],
+         cum.rewards[df$action == 1],
+         pch = 21, bg = "white", 
+         cex = 2.5, col = unlist(lapply(1:length(df$selection[df$action == 1]), function(x) {col.vec[df$selection[df$action == 1][x]]})),
+         lwd = 2
+         )
+      
+    }
+         
+       
+  text(df$trial, cum.rewards, labels = letters[df$selectio], cex = .8)
+  
+  if(show.values == T) {
+    
+    if(sum(df$outcome > 0) > 0) {
+    
+        text(df$trial[df$outcome > 0], cum.rewards[df$outcome > 0] + (ymax - ymin) / 20, labels = round(df$outcome[df$outcome > 0], 1), cex = .8)
+        
+    }
+    
+    if(sum(df$outcome < 0) > 0) {
+      
+      text(df$trial[df$outcome < 0], cum.rewards[df$outcome < 0] - (ymax - ymin) / 20, labels = round(df$outcome[df$outcome < 0], 1), cex = .8)
+
+    }
+
+  }
+  }
+  
+  # Plot Distributions
+ {
+    par(mar = c(5, 4, 4, 1))
+    require("beanplot")
+    beanplot(gamble.pdf, 
+             col = lapply(1:n.options, function(x) {col.vec[x]}),
+             what = c(0, 1, 1, 0), main = "Outcome Distributions", names = letters[1:n.options],
+             horizontal = T
+             )
+  
+}
+
+  # Plot Selection Probabilities
+  {
+  plot(1, xlim = c(0, max.trials), ylim = c(0, 1), xlab = "Trial", ylab = "Selection Probabilities", type = "n", main = "Selection Probabilities")
+  
+  for (i in 1:n.options) {
+    
+    x.vals <- plot.lag:max.trials
+    y.vals <- unlist(lapply(plot.lag:max.trials, function(x) {
+      
+      mean(df$selection[df$trial > (x - plot.lag - 1) & df$trial < x] == i)}))
+    
+    
+    lines(x.vals, y.vals, col = col.vec[i])
+    
+    
+    
+  }
+}
+
+  
+  # Plot Keep Probabilities
+  
+  
+ {
+  plot(1, xlim = c(0, max.trials), ylim = c(0, 1), xlab = "Trial", ylab = "Keep Probabilities", type = "n", main = "Keep Probabilities")
+  
+    x.vals <- plot.lag:max.trials
+    y.vals <- unlist(lapply(plot.lag:max.trials, function(x) {
+      
+      mean(df$action[df$trial > (x - plot.lag - 1) & df$trial < x] == 1)}))
+    
+    
+    lines(x.vals, y.vals)
+    
+    
+    
+  
+}
+  
+  
+  
+  
+  
+  
+  
+  }
+
+
+## Konstanz Game Simulation
+kg.sim <- function(
+                    gamble.pdf = list(  # distributions of each option
+                                      rnorm(10000, 0, 1),
+                                      rnorm(10000, .5, 3)
+                                      ),
+                    sampling.method = "random", # sampling is either random or sequential
+                    n.trials = 100,   # Total trials in game
+                    selection.method = "sm",  # Selection method [eg, sm]
+                    selection.pars = .5,
+                    action.method = "pneg", # Action Method: [trial, pneg, exp]
+                    action.pars = c(.5, 0),
+                    update.pars = c(.5, .5),
+                    plot.sim = T, # plot the result?,
+                    ...
+                    
+) {
+  
+  n.options <- length(gamble.pdf)
+  
+  ## Set up result matrix
+  
+  na.matrix <- as.data.frame(matrix(NA, nrow = n.trials, ncol = n.options * 3))
+  
+  names(na.matrix) <- c(paste("exp.", 1:n.options, sep = ""),
+                        paste("pneg.", 1:n.options, sep = ""), 
+                        paste("select.p.", 1:n.options, sep = "")
+                        )
+  
+  trial <- 1:n.trials
+  selection <- rep(NA, n.trials)
+  action <- rep(NA, n.trials)
+  outcome <- rep(NA, n.trials)
+  keep.p <- rep(NA, n.trials)
+  reward <- rep(NA, n.trials)
+  
+  result <- as.data.frame(cbind(trial, selection, keep.p, action, outcome, reward, na.matrix))
+  
+  
+  for (i in 1:nrow(result)) {
+
+    if(i == 1) {
+    
+      prior.exp.vec.i <- rep(0, n.options)
+      prior.pneg.vec.i <- rep(.5, n.options)
+      
+    }
+    
+    
+    
+    if (i > 1) {
+    
+    prior.exp.vec.i <- result[i - 1, grep("exp", names(result))]
+    prior.pneg.vec.i <- result[i - 1, grep("pneg", names(result))]
+    
+    }
+    
+
+    # Determine selection
+    
+    selection.result <- selection.fun(
+                                   exp.vec = prior.exp.vec.i,
+                                   method = selection.method, 
+                                   pars = selection.pars,
+                                   trial = result$trial[i],
+                                   n.trials = n.trials
+                                   )
+    
+    
+    selection.i <- sample(1:n.options, 1, prob = selection.result)
+    selectp.i <- selection.result[selection.i]
+    
+    # Determine action
+    
+    action.result <- action.fun(
+                                exp.vec = prior.exp.vec.i,
+                                pneg.vec = prior.pneg.vec.i,
+                                selection = selection.i,
+                                method = action.method,
+                                pars = action.pars,
+                                trial = result$trial[i],
+                                n.trials = n.trials
+                                )
+    
+    action.i <- sample(c(0, 1), 1, prob = c(1 - action.result[selection.i], action.result[selection.i]))
+    keep.p.i <- action.result[selection.i]
+    
+    
+    
+    
+    # Determine sample outcome
+    
+    selected.gamble.pdf <- gamble.pdf[[selection.i]]
+    
+    if(sampling.method == "random") {outcome.i <- sample(selected.gamble.pdf, size = 1)}
+    if(sampling.method == "sequential") {
+      
+      outcome.i <- selected.gamble.pdf[1]
+      gamble.pdf[[selection.i]] <- gamble.pdf[[selection.i]][-1]
+    
+    
+    }
+    
+    
+    # Determine reward
+    
+    if(action.i == 1) {reward.i <- outcome.i}
+    if(action.i == 0) {reward.i <- 0}
+    
+    
+    
+    
+    # Update expectations
+    
+    update.result <- update.fun(
+                                selection = selection.i,
+                                action = action.i,
+                                outcome = outcome.i, 
+                                prior.exp = prior.exp.vec.i,
+                                prior.pneg = prior.pneg.vec.i,
+                                pars = update.pars
+                                )
+
+    new.exp.vec.i <- update.result[[1]]
+    new.pneg.vec.i <- update.result[[2]]
+
+    # Write new values to result
+    
+    result$selection[i] <- selection.i
+    result$action[i] <- action.i
+    result$outcome[i] <- outcome.i
+    result[i, grep("exp", names(result))] <- new.exp.vec.i
+    result[i, grep("pneg", names(result))] <- new.pneg.vec.i
+    result[i, grep("select.p", names(result))] <- selectp.i
+    result[i, grep("keep.p", names(result))] <- keep.p.i
+    result$outcome[i] <- outcome.i
+    result$reward[i] <- reward.i
+    
+  }
+  
+  if(plot.sim == T) {
+    
+    plot.kg.sim(result, gamble.pdf, ...)
+    
+  }
+  
+  
+  return(list(result, gamble.pdf))
+   
+}
+
+@
+
+
+
+
+
+
+<<eval = F, echo = F>>=
+
+
+# Examples
+
+kg.sim(gamble.pdf = list(rnorm(1000, .5, 1), 
+                         c(rnorm(900, 1, 1), rnorm(100, -50, 1))
+                         ),
+       action.method = "trial",
+       action.pars = -2,
+       plot.lag = 10,
+       selection.pars = 0,
+       update.pars = c(.2, .8)
+       
+       )
+
+@
+
+
+
+<<echo = F, eval = F>>=
+
+# Maximum likelihood Model fitting
+
+# kg.lik.fun calculates the deviance for a dataset and given set of parameters
+
+kg.lik.fun <- function(
+                       selection = sample(1:2, 100, replace = T), 
+                       action = sample(0:1, 100, replace = T), 
+                       outcome = rnorm(100),
+                       n.options = 2,
+                       selection.method = "sm",
+                       selection.pars = .5,
+                       action.method = "pneg",
+                       action.pars = c(.5, 0),
+                       update.pars = c(.5, .5)
+                       ) {
+  
+  n.trials <- length(selection)
+
+  exp.matrix <- as.data.frame(matrix(NA, nrow = n.trials, ncol = n.options))
+  names(exp.matrix) <- paste("exp.", 1:n.options, sep = "")
+  
+  pneg.matrix <- as.data.frame(matrix(NA, nrow = n.trials, ncol = n.options))
+  names(pneg.matrix) <- paste("pneg.", 1:n.options, sep = "")
+  
+  select.p.matrix <- as.data.frame(matrix(NA, nrow = n.trials, ncol = n.options))
+  names(select.p.matrix) <- paste("select.p.", 1:n.options, sep = "")
+  
+  trial <- 1:n.trials
+  lik <- rep(NA, n.trials)
+  
+  data <- as.data.frame(cbind(trial, 
+                  select.p.matrix, 
+                  selection,
+                  keep.p = rep(NA, n.trials),
+                  action, 
+                  outcome, 
+                  exp.matrix, 
+                  pneg.matrix,
+                  lik
+                  ))
+  
+  
+  for (i in 1:nrow(data)) {
+    
+    selection.i <- data$selection[i]
+    action.i <- data$action[i]
+    outcome.i <- data$outcome[i]
+    
+    if(data$trial[i] == 1) {
+      
+    prior.exp.vec <- rep(0, n.options)
+    prior.pneg.vec <- rep(.5 ,n.options)
+    
+    }
+    
+    if(data$trial[i] > 1) {
+      
+      prior.exp.vec <- data[i - 1, grep("exp", names(data))]
+      prior.pneg.vec <- data[i - 1, grep("pneg", names(data))]
+    
+    }
+    
+    # Selection
+
+   selection.result <- selection.fun(
+                                  exp.vec = prior.exp.vec,
+                                  pars = selection.pars,
+                                  method = selection.method,
+                                  trial = data$trial[i],
+                                  n.trials = n.trials
+                                   )
+
+    select.probs <- selection.result
+    selection.i.prob <- select.probs[selection.i]
+    
+    
+    # Action
+    
+    action.result <- action.fun(exp.vec = prior.exp.vec,
+                               pneg.vec = prior.pneg.vec,
+                               selection = selection.i,
+                               trial = data$trial[i],
+                               n.trials = n.trials,
+                               pars = action.pars,
+                               method = action.method
+                             )
+    
+    keep.probs <- action.result
+    keep.i.prob <- keep.probs[selection.i]
+    
+    
+    
+    # Update
+    
+    update.result <- update.fun(
+                              selection = selection.i,
+                              action = action.i,
+                              outcome = outcome.i,
+                              prior.exp = prior.exp.vec,
+                              prior.pneg = prior.pneg.vec,
+                              pars = update.pars
+                              )
+    
+    
+    new.exp.vec <- update.result[[1]]
+    new.pneg.vec <- update.result[[2]]
+    
+    
+      
+    # likelihood calculation
+    
+    lik.i <- selection.i.prob * (keep.i.prob * data$action[i] + (1 - keep.i.prob) * (1 - data$action[i]))
+    
+    
+    ## Write values to data
+    
+    data[i, grep("keep.p", names(data))] <- keep.i.prob
+    data[i, grep("select.p", names(data))] <- select.probs
+    data[i, grep("exp", names(data))] <- new.exp.vec 
+    data[i, grep("pneg", names(data))] <- new.pneg.vec
+    data$lik[i] <- lik.i
+    
+  
+    
+    
+  }
+  
+  
+dev <- -2 * sum(log(unlist(data$lik)))
+
+if(action.method %in% c("trial", "pneg")) {K <- 4}
+if(action.method %in% c("exp")) {K <- 5}
+
+BIC <- dev + K * log(n.trials)
+
+if(sum(update.pars > 1) > 0) {dev <- 10000 ; BIC <- 10000}
+if(sum(update.pars < 0) > 0) {dev <- 10000 ; BIC <- 10000}
+if(selection.method == "eg" & (selection.pars < 0 | selection.pars > 1)) {dev <- 10000 ; BIC <- 10000}
+if(selection.method == "sm" & (selection.pars < 0)) {dev <- 10000 ; BIC <- 10000}
+
+
+return(list(data, "deviance" = dev, "BIC" = BIC))
+
+}
+
+
+# selections <- sample(1:2, 100, replace = T)
+# actions <- sample(c(0, 1), 100, replace = T)
+# outcomes <- rnorm(100)
+# 
+# kg.lik.fun(selections, actions, outcomes, update.pars = c(.2, .3))
+
+
+
+
+# kg.fit.fun optimizes kg.lik.fun
+
+kg.fit.fun <- function(selection = sample(1:2, 100, replace = T), 
+                       action = sample(0:1, 100, replace = T), 
+                       outcome = rnorm(100), 
+                       n.options = 2,
+                       selection.method = "sm",
+                       action.method = "pneg"
+                       ) {
+  
+
+
+  # define minimization functions
+  
+  if(selection.method == "eg" & action.method == "trial") {
+    
+    start.pars <- rep(.5, 4)
+    lower.pars <- rep(.001, 4)
+    upper.pars <- c(.999, 10, .99, .99)
+    
+  }
+  if(selection.method == "eg" & action.method == "pneg") {
+    
+    start.pars <- rep(.5, 4)
+    lower.pars <- rep(.001, 4)
+    upper.pars <- c(.999, 10, .99, .99)
+    
+  }
+  if(selection.method == "eg" & action.method == "exp") {
+    
+    start.pars <- c(.5, .5, 0, .5, .5)
+    lower.pars <- c(.001, .001, -10, .001, .001)
+    upper.pars <- c(.999, 10, 10, .999, .999)
+    
+  }
+  if(selection.method == "sm" & action.method == "trial") {
+    
+    start.pars <- rep(.5, 4)
+    lower.pars <- rep(.001, 4)
+    upper.pars <- c(10, 10, .99, .99)
+    
+  }
+  if(selection.method == "sm" & selection.method == "pneg") {
+    
+    start.pars <- rep(.5, 4)
+    lower.pars <- rep(.001, 4)
+    upper.pars <- c(10, 10, .99, .99)
+    
+  }
+  if(selection.method == "sm" & selection.method == "exp") {
+    
+    start.pars <- c(.5, .5, 0, .5, .5)
+    lower.pars <- c(.001, .001, -10, .001, .001)
+    upper.pars <- c(10, 10, 10, .999, .999)
+  }
+  
+  
+  if(length(start.pars) == 4) {
+    
+  to.minimize <- function(pars) {
+
+    fit.result <- kg.lik.fun(selection, 
+                           action, 
+                           outcome, 
+                           n.options,
+                          selection.method = selection.method,
+                          selection.pars = pars[1],
+                          action.method = action.method,
+                          action.pars = pars[2],
+                          update.pars = pars[3:4]
+                          )
+    
+    deviance <- fit.result[[2]]
+    
+    return(deviance)
+    
+  }
+  
+  }
+  
+
+  if(length(start.pars) == 5) {
+    
+  to.minimize <- function(pars) {
+
+    fit.result <- kg.lik.fun(selection, 
+                           action, 
+                           outcome, 
+                           n.options,
+                            selection.method = selection.method,
+                          selection.pars = pars[1],
+                          action.method = action.method,
+                          action.pars = pars[2:3],
+                          update.pars = pars[4:5]
+                          )
+    
+    deviance <- fit.result[[2]]
+    
+    return(deviance)
+    
+  }
+  
+  }
+  
+  
+  fit <- optim(start.pars, fn = to.minimize)
+  
+#     fit <- nlminb(
+#                 start = start.pars,
+#                 lower = lower.pars,
+#                 upper = upper.pars,
+#                 objective = to.minimize, 
+#                 control = list(trace = 1)
+#                 )
+#   
+  
+  return(fit)
+
+}
+
+
+
+#-----------
+#  Test recoverability of parameters
+#-----------
+
+# Generate participant data
+
+selection.method.true <- "eg"  # [sm]
+action.method.true <- "trial"  # [pneg, trial]
+pars.true <- c(.1, .1, .1, .1)  # choice sens [0, Inf], pneg.tol [0, Inf], peek.theta [0, 1], keep.theta [0, 1]
+n.trials <- 100
+gamble.pdf <- list(rnorm(1000, .5, 1), 
+                   c(rnorm(1000, 1, 4)))
+
+
+test.data <- kg.sim(gamble.pdf = gamble.pdf,
+                    sampling.method = "random",
+                    n.trials = n.trials,
+                    selection.method = selection.method.true,
+                    selection.pars = pars.true[1],
+                    action.method = action.method.true,
+                    action.pars = pars.true[2],
+                    update.pars = pars.true[3:4],
+                    plot.sim = F
+                    )[[1]]
+
+
+# Fit True Model
+
+selection.method.test <- selection.method.true
+action.method.test <- action.method.true
+
+fit.result.true <- kg.fit.fun(
+          selection = as.numeric(test.data$selection), 
+           action = as.numeric(test.data$action), 
+           outcome = as.numeric(test.data$outcome), 
+           n.options = 2,
+          selection.method = selection.method.true,
+          action.method = action.method.true
+           )
+
+fit.pars.true <- fit.result.true$par
+fit.dev.true <- fit.result.true$value
+
+if(action.method.true %in% c("trial", "pneg")) {K <- 4}
+if(action.method.true %in% c("exp")) {K <- 5}
+
+
+true.bic <- fit.dev.true + K * log(n.trials)
+
+true.bic
+
+
+
+# Fit Wrong Model
+
+selection.method.test <- "eg"
+action.method.test <- "pneg"
+
+fit.result <- kg.fit.fun(
+          selection = as.numeric(test.data$selection), 
+           action = as.numeric(test.data$action), 
+           outcome = as.numeric(test.data$outcome), 
+           n.options = 2,
+          selection.method = selection.method.test,
+          action.method = action.method.test
+           )
+
+fit.pars.test <- fit.result$par
+fit.dev.test <- fit.result$value
+
+if(action.method.test %in% c("trial", "pneg")) {K <- 4}
+if(action.method.test %in% c("exp")) {K <- 5}
+
+test.bic <- fit.dev.test + K * log(n.trials)
+
+test.bic
+
+
+BF <- exp(-.5 * (true.bic - test.bic))
+
+BF
+
+@
+
+
+
+
+
+
+
+<<echo = F, eval = F>>=
+
+# ----------------------------
+# Simulate performance in KG
+# Set participant parameters and gamble environment
+# ----------------------------
+
+seconds.to.text <- function(seconds) {
+ 
+if(!is.finite(seconds)) {return("Inf")}
+     
+if(is.finite(seconds)) {
+  days<-floor(seconds/(60*60*24))
+  hours<-floor((seconds-60*60*24*days)/(60*60))
+  minutes<-floor((seconds-60*60*24*days-60*60*hours)/(60))
+  
+  ifelse(days==1,days.text<-"1 day, ",days.text<-paste(days," days, ",sep=""))
+  ifelse(hours==1,hours.text<-"1 hour, ",hours.text<-paste(hours," hours, ",sep=""))
+  ifelse(minutes==1,minutes.text<-"1 minute",minutes.text<-paste(minutes," minutes",sep=""))
+  
+  if(days==0) {days.text<-""}
+  if(hours==0) {hours.text<-""}
+  
+  output<-paste(days.text,hours.text,minutes.text,sep="")
+  
+  return(output)
+}
+  
+}
+
+# Define sequence of agent parameters
+
+choice.sens.seq <- seq(0, 5, 1)
+pneg.tol.seq <- c(.01, seq(1, 3, .5))
+theta.seq <- seq(0, 1, .2) # uses for both theta.peek and theta.keep
+
+common.theta <- T
+
+
+# Set the environment(s)
+
+n.trials <- 100
+n.sim <- 10
+
+environments <- list( 
+                      list(
+                      rnorm(1000, -5, 1),
+                      rnorm(1000, 5, 1)
+                      )
+                        
+)
+
+environment.names <- c("kg env 0")
+
+
+for(environment.i in 1:length(environments)) {
+  
+  gamble.pdf <- environments[[environment.i]]
+  file.name <- environment.names[environment.i]
+
+  
+# Set up design matrix
+
+dm <- expand.grid(select.method = "sm",  # Selection method, either "sm" for softmax or "eg" for epsilon greedy
+                  choice.sens = choice.sens.seq, # choice sensitivity parameter
+                  pneg.tol = pneg.tol.seq, # pneg threshold parameter (for observe v keep)
+                  theta.peekkeep = theta.peekkeep.seq, # impression updating parameter
+                  theta.peek = theta.seq,
+                  theta.keep = theta.seq,
+                  n.trials = n.trials,
+                  sim = 1:n.sim
+                  )
+
+if(common.theta) {dm <- dm[dm$theta.peek == dm$theta.keep,]}
+
+# Set up clusters
+
+## Run simulations
+
+setwd("/Users/Nathaniel/Desktop/kg_sim")
+
+progress <- cbind(c("current.run", "total.runs", "% complete", "process.time", 
+                         "process.time.text", "remaining.time", "remaining.time.text"), 
+                  c(0, nrow(dm), 0, 0, 0, 0, 0))
+
+write.table(progress, paste("progress/", file.name, " progress.txt", sep = ""), row.names = F, col.names = F)
+
+
+# Define cluster function
+
+kg.result.fun <- function(i) {
+   options(error = NULL)
+  start.time <- proc.time()[3]
+  
+  result <- kg.sim(gamble.pdf = gamble.pdf,
+                   n.trials = dm$n.trials[i],
+                   select.method = dm$select.method[i],
+                   epsilon = .1,
+                   choice.sens = dm$choice.sens[i],
+                   pneg.tol = dm$pneg.tol[i],
+                   theta.peek = dm$theta.peek[i],
+                   theta.keep = dm$theta.keep[i]
+                   )[[1]]
+  
+  observe.p <- mean(result$action == 0)
+  reward.sum <- sum(result$reward)
+  switch.p <- mean(result$selection[2:dm$n.trials[i]] != result$selection[1:(dm$n.trials[i] - 1)])
+  selections.mean <- unlist(lapply(1:length(gamble.pdf), function(x) {mean(result$selection == x)}))
+  
+  gamble.means <- unlist(lapply(1:length(gamble.pdf), function(i) {mean(gamble.pdf[[i]])}))
+  
+  h.option <- which(gamble.means == max(gamble.means))
+  
+  observe.h.p <- with(result, mean(action == 0 & selection == h.option))
+  bet.h.p <- with(result, mean(action == 1 & selection == h.option))
+  select.h.p <- with(result, mean(selection == h.option))
+  
+  output <- c(reward.sum, observe.p, switch.p, select.h.p, observe.h.p, bet.h.p, selections.mean)
+  
+  # Update progress
+  
+#   running.time <- proc.time()[3] - start.time
+#   
+#   old.progress <- read.table(paste("progress/", file.name, " progress.txt", sep = ""), 
+#                              stringsAsFactors = F)
+# 
+#   current.run <- as.numeric(old.progress[1, 2]) + 1
+#   total.runs <- as.numeric(old.progress[2, 2])
+#   percent.complete <- current.run / total.runs
+#   process.time <- as.numeric(old.progress[4, 2]) + running.time
+#   process.time.text <- seconds.to.text(process.time)
+#   remaining.time <- (1 / percent.complete) * process.time - process.time
+#   remaining.time.text <- seconds.to.text(remaining.time)
+#   
+#   
+#   new.progress <- cbind(c("current.run", "total.runs", "% complete", "process.time", 
+#                          "process.time.text", "remaining.time", "remaining.time.text"), 
+#                         c(current.run, 
+#                        total.runs, 
+#                        paste(round(100 * percent.complete, 0), "% complete", sep = ""), 
+#                        round(process.time, 0), 
+#                        process.time.text, 
+#                        round(remaining.time, 0),
+#                        remaining.time.text)
+#                      )
+#   
+# 
+#   write.table(new.progress, paste("progress/", file.name, " progress.txt", sep = ""), 
+#               row.names = F, col.names = F)
+  
+  return(output)
+  
+}
+
+
+# Loop version
+#result.ls <- vector("list", nrow(dm))
+#for (i in 1:nrow(dm)) {result.ls[[i]] <- kg.result.fun(i)}
+
+
+#Cluster version
+library("snowfall")
+
+sfInit(parallel = TRUE, cpus = 32)
+sfExport("seconds.to.text")
+sfExport("action.fun")
+sfExport("select.fun")
+sfExport("update.fun")
+sfExport("kg.sim")
+sfExport("dm")
+sfExport("gamble.pdf")
+sfExport("n.trials")
+sfExport("file.name")
+
+result.ls <- sfLapply(1:nrow(dm), kg.result.fun)
+
+
+# Organize results
+
+result.df <- as.data.frame(matrix(unlist(result.ls), nrow = nrow(dm), ncol = length(result.ls[[1]]), byrow = T))
+
+names(result.df) <- c("reward.sum", "observe.p", "switch.p", "select.h.p", "observe.h.p", "bet.h.p",
+                      paste("select.", 1:length(gamble.pdf), sep = ""))
+
+dm <- cbind(dm, result.df)
+
+write.table(dm, file = paste("final tables/", file.name, ".txt", sep = ""))
+
+for (i in 1:length(gamble.pdf)) {
+  
+  write.table(gamble.pdf[[i]], file = paste("final tables/", file.name, " gamble ", i, ".txt", sep = ""))
+  
+}
+
+}
+
+
+@
+
+<<echo = F, eval = F>>=
+
+setwd("/Users/Nathaniel/Desktop/kg_sim/final tables")
+
+# Show environments
+
+show.environments.fun <- function(env.i.vec) {
+  
+  env.n <- length(env.i.vec)
+  par(mfrow = c(ceiling(sqrt(env.n)), ceiling(sqrt(env.n))))
+  
+  
+  for(i in 1:env.n) {
+    
+  pdf.files <- list.files()[grep(paste("env ", env.i.vec[i], " gamble", sep = ""), list.files())]
+  
+  pdfs <- vector("list", length(pdf.files))
+  
+  for(j in 1:length(pdf.files)) {pdfs[[j]] <- read.table(pdf.files[j])}
+
+min.val <- min(unlist(pdfs))
+max.val <- max(unlist(pdfs))
+
+plot(1, xlim = c(min.val, max.val), ylim = c(0, 1), 
+     ylab = "density", main = paste("Environment ", env.i.vec[i], sep = ""), type  = "n")
+
+for (pdf.i in 1:length(pdfs)) {
+  
+vals <- unlist(pdfs[[pdf.i]])
+  
+  lines(density(vals), lty = pdf.i, col = "black")
+  abline(v = mean(vals), lty = pdf.i)
+  
+}
+  
+}
+
+  
+}
+
+
+# Analyze simulation results
+analyze.environment.fun <- function(env.i.vec, weight.vec = NA) {
+  
+  if(mean(is.na(weight.vec)) == 1) {weight.vec <- rep(1/length(env.i.vec), length(env.i.vec))}
+  
+  col.vec <- c("red", "blue", "green")
+  
+    require("dplyr")
+  
+  env.n <- length(env.i.vec)
+  
+  sim.ls <- vector("list", env.n)
+  sim.agg.ls <- vector("list", env.n)
+  
+  choice.sens.ls <- vector("list", env.n)
+  pneg.tol.ls <- vector("list", env.n)
+  updating.theta.ls <- vector("list", env.n)
+  
+  environments.ls <- vector("list", env.n)
+  
+  for(i in 1:env.n) {
+
+    sim.ls[[i]] <- read.table(paste("kg env ", env.i.vec[i], ".txt", sep = ""))
+  
+sim.agg.ls[[i]] <- sim.ls[[i]] %>%
+  group_by(select.method, choice.sens, pneg.tol, updating.theta) %>%
+  summarise(
+    reward.mean = mean(reward.sum),
+    reward.median = median(reward.sum),
+    observe.p = mean(observe.p),
+    switch.p = mean(switch.p),
+    select.h.p = mean(select.h.p),
+    observe.h.p = mean(observe.h.p),
+    bet.h.p = mean(bet.h.p),
+    n = n()
+  )
+
+choice.sens.ls[[i]] <- with(sim.agg.ls[[i]], tapply(reward.mean, choice.sens, mean))
+pneg.tol.ls[[i]] <- with(sim.agg.ls[[i]], tapply(reward.mean, pneg.tol, mean))
+updating.theta.ls[[i]] <- with(sim.agg.ls[[i]], tapply(reward.mean, updating.theta, mean))
+
+
+    
+  pdf.files <- list.files()[grep(paste("env ", env.i.vec[i], " gamble", sep = ""), list.files())]
+  
+  gamble.pdf <- vector("list", length(pdf.files))
+  
+  for(j in 1:length(pdf.files)) {gamble.pdf[[j]] <- read.table(pdf.files[j])}
+  
+environments.ls[[i]] <- gamble.pdf
+
+
+}
+
+
+par(mfrow = c(1, 4))
+
+  # Plot distributions
+  
+min.val <- min(unlist(environments.ls))
+max.val <- max(unlist(environments.ls))
+
+plot(1, xlim = c(min.val, max.val), ylim = c(0, 1), 
+     ylab = "density", main = "Environments", type  = "n")
+
+
+legend("topright", letters[1:env.n], col = col.vec[1:env.n], lty = rep(1, env.n))
+
+
+for (env.i in 1:env.n) {
+
+  pdfs <- environments.ls[[env.i]]
+  
+for (pdf.i in 1:length(pdfs)) {
+  
+vals <- unlist(pdfs[[pdf.i]])
+  
+  lines(density(vals), lty = pdf.i, col = col.vec[env.i])
+ # abline(v = mean(vals), lty = pdf.i, col = col.vec[env.i])
+  
+}
+  
+}
+  
+
+
+
+  
+for (stat.i in 1:3) {
+  
+  if(stat.i == 1) {performance.ls <- choice.sens.ls ; title <- "Choice Sensitivity"}
+  if(stat.i == 2) {performance.ls <- pneg.tol.ls ; title <- "Negative Tolerance"}
+  if(stat.i == 3) {performance.ls <- updating.theta.ls ; title <- "Updating Rate"}
+  
+min.val <- min(unlist(performance.ls))
+max.val <- max(unlist(performance.ls))  
+
+plot(1, xlim = c(min(as.numeric(names(unlist(performance.ls)))), max(as.numeric(names(unlist(performance.ls))))),
+     ylim = c(min.val, max.val), type = "n", main = title
+     )
+
+legend("right", letters[1:env.n], col = col.vec[1:env.n], lty = rep(1, env.n))
+
+
+## Add lines for individual environments
+
+for (i in 1:env.n) {
+  
+lines(as.numeric(names(performance.ls[[i]])),
+      performance.ls[[i]],
+      lty = i, col = col.vec[i])
+}
+
+if(env.n > 1) {
+
+## Add weighted lines
+combined <- as.data.frame(matrix(unlist(performance.ls), 
+                                 nrow = length(performance.ls[[1]]), 
+                                 ncol = length(performance.ls)))
+
+combined.weighted <- combined
+for(j in 1:ncol(combined.weighted)) {combined.weighted[,j] <- combined.weighted[,j] * weight.vec[j]}
+
+average.performance <- rowSums(combined.weighted)
+
+lines(as.numeric(names(performance.ls[[1]])),
+      average.performance,
+      lwd = 2
+      )
+
+}
+  
+}
+  
+  
+}
+  
+
+analyze.environment.fun(1)
+@
+
+
+<<echo = F, eval = F>>=
+
+# Complicated version, maybe to use later
+unc.fun <- function(outcomes, w.theta = 0, max.sd = 10, min.sd = 0, type = "weighted", u.theta = 1) {
+
+  n <- length(outcomes)
+  
+if(mean(is.na(outcomes)) == 1) {uncertainty <- 100 ; expectation <- 0}
+  
+if(type == "weighted") {
+ 
+    
+    weights <- 1 / (1:n) ^ w.theta
+    
+    sd.weighted <- wt.sd(outcomes, weights / sum(weights))
+ 
+    # What is the denominator?
+    
+    valid.n <- n
+    
+    se.weighted <- sd.weighted / sqrt(valid.n)
+    
+    # Rescale to 0 to 100
+    
+    uncertainty <- se.weighted / max.sd * 100
+    
+    if(uncertainty > 100) {uncertainty <- 100}
+    
+   expectation <- sum(outcomes * (weights / sum(weights)))
+    
+   }
+  
+  
+
+  
+if(type == "updating") {
+  
+  # Calculate expectations
+  
+  exp.vec <- c(outcomes[i], rep(NA, n - 1))
+  
+  for (i in 2:n) {
+    
+    exp.vec[i] <- exp.vec[i - 1] + u.theta * (outcomes[i] - exp.vec[i - 1])
+    
+  }
+  
+  # Calculate sd
+  
+  sd.vec <- c(0, rep(NA, n - 1))
+  
+  for(i in 2:length(sd.vec)) {
+  
+  sd.vec[i] <- sd.vec[i - 1] + u.theta * (abs(outcomes[i] - exp.vec[i])) 
+    
+  }
+  
+  sd.new <- sd.vec[n]
+  
+  se.new <- sd.new / sqrt(n)
+  
+    uncertainty <- se.new / max.sd * 100
+    
+    if(uncertainty > 100) {uncertainty <- 100}
+  
+  expectation <- exp.vec[n]
+    
+}  
+  
+  return(c(uncertainty, expectation))
+  
+}
+
+@
+
+
+
+
+
+
+\bibliography{/Users/Nathaniel/Dropbox/Nathaniel_BibTek}
+\end{document}
