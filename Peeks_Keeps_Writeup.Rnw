@@ -7,7 +7,7 @@
 \usepackage{graphicx}
 \usepackage{rotating}
 \usepackage{pdfpages}
-\usepackage{Sweave}
+%\usepackage{Sweave}
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage{eurosym}
@@ -17,10 +17,10 @@
 
 \title{Peeks and Keeps: A new paradigm to study the exploration-exploitation trade-off}
 \shorttitle{peeks and keeps}
-\author{Nathaniel D. Phillips}
-\affiliation{University of Konstanz}
+\twoauthors{Nathaniel D. Phillips and Hans Joerg Neth}{Daniel Navarro}
+\twoaffiliations{University of Konstanz}{University of Adelaide}
 
-\abstract{Many important decision tasks involve an exploration-exploitation trade-off, where organisms have the competing goals of gaining new information (exploration) to improve future decisions, and acting on existing information (exploitation). The most common paradigm to study this trade-off experimentally is the n-armed bandit, where decision makers reap real costs and rewards on every trial. We suggest that, unlike the n-armed bandit, many real world tasks allow decision makers to explore options (such as stock price changes) without reaping any costs or rewards. To address this, we introduce a new experimental paradigm called ``Peeks and Keeps'' that combines apects of the n-armed bandit with the 'bet-observe' task (cite Tversky). Unlike the n-armed bandit, Peeks and Keeps gives decision makers the option of explicitly separating exploration and exploitation behavior, where exploration provides only information but no costs or rewards, and exploitation gives both information and costs and rewards. This paradigm not only increases the empirical validity of the n-armed bandit, but also provides researchers with an explicit measure of exploration that is hidden in other paradigms.}
+\abstract{Many important decision tasks involve an exploration-exploitation trade-off, where organisms have the competing goals of gaining new information (exploration) to improve future decisions, and acting on existing information (exploitation). The most common paradigm to study this trade-off experimentally is the n-armed bandit, where decision makers reap real costs and rewards on every trial. We suggest that, unlike the n-armed bandit, many real world tasks allow decision makers to explore options (such as stock price changes) without reaping any costs or rewards. To address this, we introduce a new experimental paradigm called ``Peeks and Keeps'' that combines aspects of the n-armed bandit with the `bet-observe' task \citep{tversky1966information}. Unlike the n-armed bandit, Peeks and Keeps gives decision makers the option of explicitly separating exploration and exploitation behavior, where exploration provides only information but no costs or rewards, and exploitation gives both information and costs and rewards. This paradigm not only increases the empirical validity of the n-armed bandit, but also provides researchers with an explicit measure of exploration that is hidden in other paradigms.}
 
 \keywords{decisions from experience, learning, information search, exploration-exploitation, foraging}
 
@@ -40,7 +40,7 @@ Many of the most important real world decisions require individuals to reap cons
 
 This conflict between obtaining new information and acting on existing information is known as the exploration-exploitation trade-off. The exploration-exploitation (EE) trade-off is one of the most widely studied aspects of decision making from human to non-human organisms. The exploration-exploitation trade-off represents a goal conflict in decisions under uncertainty, where an organism is trying to maximize its long term rewards from \textit{a priori} unknown options. On the one hand, individuals want to explore options by gaining as much information as possible to improve the quality of their future decisions. On the other hand, they want to \textit{exploit} options by acting on existing information in order to increase short-term rewards.
 
-One of the most widely used experimental tasks used to study the exploration-exploitation conflict is the n-armed bandit. In an n-armed bandit, participants have a fixed number of trials to select an opion and experience a consequential reward.
+One of the most widely used experimental tasks used to study the exploration-exploitation conflict is the n-armed bandit. In an n-armed bandit, participants have a fixed number of trials to select an option and experience a consequential reward.
 
 
 
@@ -52,11 +52,11 @@ One of the most widely used experimental tasks used to study the exploration-exp
   
   \item One can easily imagine real-world cases where people explicitly engage in purely epistemic actions. For example, imagine a person who wishes to learn about the stock market prior to risking any real money. He can do this by viewing sequential returns from several stocks and observing their risk. Alternatively, a new resident to a town can learn about local restaurants by asking her neighbors about their recent experiences. In all of these cases, the actor is learning about options without reaping consequences.
   
-  \item Clearly these purely epistemic actions are both psychologically and behaviorally distinct from pragmatic actions, where one obtains \textit{both} information and immediate consequences. For example, our stock invester who starts investing his money into stocks will then not only learn about their performance, but also reap gains and suffer consequences. Similarly, the new town resident who starts frequenting local restaurants will continue learning about them but also experience immediate pragmatic outcomes.
+  \item Clearly these purely epistemic actions are both psychologically and behaviorally distinct from pragmatic actions, where one obtains \textit{both} information and immediate consequences. For example, our stock investor who starts investing his money into stocks will then not only learn about their performance, but also reap gains and suffer consequences. Similarly, the new town resident who starts frequenting local restaurants will continue learning about them but also experience immediate pragmatic outcomes.
   
   \item Somewhat puzzlingly, paradigms that have been used to study exploration-exploitation trade-off in humans has largely ignored behavioral differences in epistimic and pragmatic actions. In the N-armed bandit task, players are only allowed to engage in one type of behavior - choice, which always provides both epistemic and pragmatic rewards. Players are not given the option to engage in purely epistemic actions. 
   
-  \item This can lead to erroenous inferences. The same choice behavior could be interpreted as either resulting from an epistemic or pragmatic motivation. Until now, researchers have had to use computational cognitive modeling techniques to attribute choices post-hoc to either an epistemic or pragmatic underlying goal.
+  \item This can lead to erroneous inferences. The same choice behavior could be interpreted as either resulting from an epistemic or pragmatic motivation. Until now, researchers have had to use computational cognitive modeling techniques to attribute choices post-hoc to either an epistemic or pragmatic underlying goal.
   
   \item We believe a new paradigm is needed. One where individuals have the option to explicitly explore or exploit options. This task will not only be a better model of many real-world decision tasks than previous paradigms, but will also allow researchers to explicitly observe behavior consistent with purely epistemic goals.
 
@@ -78,65 +78,140 @@ One of the most widely used experimental tasks used to study the exploration-exp
 \end{center}
 
 
-In a multi-armed bandit task, participants choose between multiple a priori unknown options over several trials and receive rewards (or costs) on each trial. Because decision makers reap consequences on every trial, the n-armed bandit task does not allow purely episemic actions. The Iowa Gambling Task (IGT) is one famous example of this paradigm. Using cognitive models such as the expectancy-valence model, researchers have used the IGT to study cognitive mechanisms such as loss-aversion, recency, and choice consistency in both healthy and non-healthy individuals (Yechiam et al., 2005).
+In a multi-armed bandit task, participants choose between multiple a priori unknown options over several trials and receive rewards (or costs) on each trial. Because decision makers reap consequences on every trial, the n-armed bandit task does not allow purely epidemic actions. The Iowa Gambling Task (IGT) is one famous example of this paradigm. Using cognitive models such as the expectancy-valence model, researchers have used the IGT to study cognitive mechanisms such as loss-aversion, recency, and choice consistency in both healthy and non-healthy individuals \citep{yechiam2005models}.
 
-Two paradigms have been used to study purely epistemic actions: the sampling paradigm of decisions from experience \citep{hertwig2004decisions} and the bet-observe task \citep{tversky1966information}. Like the n-armed bandit task, both paradigms present participants with multiple, a priori unknown options. In the sampling paradigm, participants can then sample from options, without consequence, as many times as they would like before making a single consequential choice. Here, participants engage in a self-determiend number of purely epistemic actions stringly prior to a single purely pragmatic action. After making their final choice, participants receive the consequences from their choice but cannot continue to observe. Thus, in the sampling paradigm observion strictly occurs prior to exploitation with no possibility to alternate between the two modes.
+Two paradigms have been used to study purely epistemic actions: the sampling paradigm of decisions from experience \citep{hertwig2004decisions} and the bet-observe task \citep{tversky1966information}. Like the n-armed bandit task, both paradigms present participants with multiple, a priori unknown options. In the sampling paradigm, participants can then sample from options, without consequence, as many times as they would like before making a single consequential choice. Here, participants engage in a self-determined number of purely epistemic actions strictly prior to a single purely pragmatic action. After making their final choice, participants receive the consequences from their choice but cannot continue to observe. Thus, in the sampling paradigm observation strictly occurs prior to exploitation with no possibility to alternate between the two modes.
 
-As far as we know, the bet-observe task is the only paradigm that allows individuals to alternate between pure exploration and pure exploitation. In the bet-observe task, an individual is presented with two options. On each of M trials, one of the two options will produce a reward indicated by a green light. On each trial, the participant selects an option and makes one of two choices. He can *observe* an option, see which one produces the reward, but not receive the reward. Or he can *bet* on an option. If the player bets on an option, he will gain its underlying reward but will not see whether the reward is present. Because the participant only sees the option outcome if he observes, he can only learn about the options' underlying distributions on observation trials, but can only reap rewards on betting trials.
+As far as we know, the bet-observe task is the only paradigm that allows individuals to alternate between pure exploration and pure exploitation. In the bet-observe task, an individual is presented with two options. On each of M trials, one of the two options will produce a reward indicated by a green light. On each trial, the participant selects an option and makes one of two choices. He can \textit{observe} an option, see which one produces the reward, but not receive the reward. Or he can \textit{bet} on an option. If the player bets on an option, he will gain its underlying reward but will not see whether the reward is present. Because the participant only sees the option outcome if he observes, he can only learn about the options' underlying distributions on observation trials, but can only reap rewards on betting trials.
 
-Navarro and Newell (2014) derived optimal decision strategies for two versions of the game: stationary and nonstationary. In the stationary version of the game, the reward probability distributions are fixed. Specifically, the probability that the left option has a reward $l_{p}$ is fixed and does not change over time. In the stationary task, an optimal learner will begin the task by observing outcomes until he reaches a pre-defined information threshold. Once he reaches this threshold, he will switch to a betting strategy and will always bet on the perceived better option. In the nonstationary version of the game, the reward probability distributions can change at any time. For example, with some probability $\alpha$ the probability $l_{p}$ could change to a value drawn from a uniform distribution. In this version of the game, the optimal decision strategy alternates between observering and betting throughout the game. In other words, the actor will begin by observing for a few trials until a certain information threshold is reached, then he will switch to betting for a few trials. He will then switch to observing in order to see if $l_{p}$ has changed.
+Navarro and Newell (2014) derived optimal decision strategies for two versions of the game: stationary and non-stationary. In the stationary version of the game, the reward probability distributions are fixed. Specifically, the probability that the left option has a reward $l_{p}$ is fixed and does not change over time. In the stationary task, an optimal learner will begin the task by observing outcomes until he reaches a pre-defined information threshold. Once he reaches this threshold, he will switch to a betting strategy and will always bet on the perceived better option. In the non stationary version of the game, the reward probability distributions can change at any time. For example, with some probability $\alpha$ the probability $l_{p}$ could change to a value drawn from a uniform distribution. In this version of the game, the optimal decision strategy alternates between observing and betting throughout the game. In other words, the actor will begin by observing for a few trials until a certain information threshold is reached, then he will switch to betting for a few trials. He will then switch to observing in order to see if $l_{p}$ has changed.
 
-However, because betting in the bet-observe task does not provide information, decision makers cannot learn anything on betting trials. This is not an inherent flaw in the paradigm - indeed, obscuring information from betting trials elegantly separates epistemic from pragmatic actions. However, because many, if not most, real-world decision tasks provide information on both exploration and exploitation trials, the bet-observe task is a poor model of most real-world decisions. From food choice to mate choice, explitation decisions (i.e.; consuming food or selecting a mate) will always provide information to the decision maker that it can use to update its impressions and guide future search. 
+However, because betting in the bet-observe task does not provide information, decision makers cannot learn anything on betting trials. This is not an inherent flaw in the paradigm - indeed, obscuring information from betting trials elegantly separates epistemic from pragmatic actions. However, because many, if not most, real-world decision tasks provide information on both exploration and exploitation trials, the bet-observe task is a poor model of most real-world decisions. From food choice to mate choice, exploitation decisions (i.e.; consuming food or selecting a mate) will always provide information to the decision maker that it can use to update its impressions and guide future search. 
 
 In order to study how people alternate between explicit exploration and exploitation, we introduce the Peeks and Keeps task.
 
 
 \section{Peeks and Keeps}
 
-Peeks and Keeps is an extension of an N-armed bandit task that explicitly separates exploration and exploitation decisions. In the task, participants repeatedly select one of N options with *a priori* unknown underlying probability distributions over the course of M trials. On each trial, the participant selects an option and elects to either *observe* the next outcome without financial feedback, or *bet* on the outcome and receive the financial feedback. At the end of M trials, the participant is paid the sum of all sample outcomes revealed on bet trials. If he always observes and never bets, he receives no bonus. If he bets on every trial, he receives the sum total of all samples.
+Peeks and Keeps is an extension of an N-armed bandit task that explicitly separates exploration and exploitation decisions. In the task, participants repeatedly select one of N options with \textit{a priori} unknown underlying probability distributions over the course of M trials. On each trial, the participant selects an option and elects to either \textit{observe} the next outcome without financial feedback, or \textit{bet} on the outcome and receive the financial feedback. At the end of M trials, the participant is paid the sum of all sample outcomes revealed on bet trials. If he always observes and never bets, he receives no bonus. If he bets on every trial, he receives the sum total of all samples.
 
-\subsection{Decision Strategies}
+\section{Decision Strategies}
 
 We split cognitive strategies in Peeks and Keeps into three distinct processes: Selection, Action, and Update. The selection process determines which option players interact with, the action process determines whether a player decides to peek or keep, and the updating process dictates how a player updates his or her impressions of that option after the action.
 
-The specific order of these processes depends on the overarching search model. In the "SAU" Model, we assume that decision makers process information in the order "Selection-Action-Update." In the "ASU" model, we assume that they process information in the order "Action-Selection-Update."
+The specific order of these processes depends on the overarching search model. In the SAU Model, we assume that decision makers process information in the order Selection-Action-Update. In the ASU model, we assume that they process information in the order Action-Selection-Update.
 
-\subsection{SAU}
 
-\subsubsection{Selection}
+\begin{center}
+<<echo = F, fig.width = 3, fig.height = 3>>=
 
-We follow prior research in assuming that people use a soft-max selection rule, where the probability that an option is selected is determined by the current expectation of that option relative to the sum of the expectations of all options. Formally:
+par(mar = rep(0, 4))
+plot(1, xlim = c(1, 4), ylim = c(1, 4), 
+     xaxt = "n", yaxt = "n", ylab = "", 
+     xlab = "", type = "n", bty = "n")
+
+text(rep(1, 4), 4:1, labels = c("State", "First", "Second", "Third"), cex = c(1.5, rep(1, 3)), adj = 0)
+text(rep(2, 4), 4:1, labels = c("SAU", "1. Selection", "2. Action", "3. Update"), cex = c(1.5, rep(1, 3)), adj = 0)
+text(rep(3, 4), 4:1, labels = c("ASU", "1. Action", "2. Selection", "3. Update"), cex = c(1.5, rep(1, 3)), adj = 0)
+
+arrows(rep(1.1:3.1, times = 1, each = 2), 
+       rep(3:2, times = 3) - .2,
+       rep(1.1:3.1, times = 1, each = 2),
+       rep(2:1, times = 3) + .15,
+       length = .2
+       )
+
+abline(v = 1.75, lty = 2)
+abline(h = 3.5, lty = 2)
+@
+\end{center}
+
+In addition to dictating the order of the cognitive processes, the SAU and ASU models each potentially dictate different cognitive processes for each processing step. In the next two sections, we describe potential cognitive processes under each model.
+
+\section{SAU}
+
+The SAU model assumes that decision makers begin by selecting an option, followed by an action decision. Because the SAU model begins with the selection process, the SAU model is most similar to existing cognitive models of search \citep{yechiam2005models}.
+
+\subsection{Selection}
+
+\subsubsection{Soft-Max}
+
+We follow prior research in assuming that people use a soft-max selection rule, where the probability that an option is selected is determined as an increasing function of the expectation of that option relative to the sum of the expectations of all options. Formally:
 
 \begin{center}
 \begin{equation}
 
 Pr[G_{j}(t+1)]=\frac{e^{\theta(t) \times E_{j}(t)}}{\sum_{k}e^{\theta(t) \times E_{k}(t)}}
 
+
 \end{equation}
 \end{center}
 
-The term $\theta(t)$ governs how sensitive people are to expectations in directing their selection. We follow previous researchers \citep{yechiam2005models} in setting $\theta(t)$ to be a function of time and a response-sensitivity parameter c:
+The term $\theta(t)$ governs how sensitive people are to expectations in directing their selection. We follow previous researchers \citep{yechiam2005models} in setting $\theta(t)$ to be a function of time and a response-sensitivity parameter c
 
 \begin{center}
 \begin{equation}
 \label{eq:thetat}
 
-\theta(t) = (\frac{t}{n_{t}})^{c}
+\theta(t) = (\frac{t}{n_{t} \times .5})^{c}
 
+\label{eq:softmaxtheta}
 \end{equation}
 \end{center}
 
-where c has a support of [0, Inf]. As c increases, people are more likely to select the option with the highest expectation. Small values of c indicate larger degrees of exploration, while large values of c indicate less exploration.
+where c has a support of [0, Inf]. As c increases, people more clearly separate their search into distinct exploration and exploitation phases. Small values of c less clear distinction between phases. Because equation \ref{eq:thetat} is a monotonically increasing function of trials, participants are assumed to be increasingly more likely to select options with higher expectations as trials increase\footnote{Note: The curve has an indifference point where the probability of selecting all options is equally likely. In Equation~\ref{eq:softmaxtheta}, the indifference point occurs at half-way through the game (total trials times .50). However, the model could be expanded to allow this indifference point to occur at a different location. Indeed, other authors have hard-coded this indifference point to occur at a trial of 10 \citep{yechiam2005models}}.
 
-Importantly, because equation \ref{eq:thetat} is a monotonically increasing function of trials, participants are assumed to be increasingly more likely to select options with higher expectations as trials increase.
 
-\subsubsection{Action}
+<<echo = F, fig.width = 4, fig.height = 4, message = F>>=
+require("circlize")
+sm.select.fun <- function(trial = 10, expectations = c(2, 1), total.trials = 100, c = 1, kink = NA) {
 
-Once an option is selected, the decision maker decides whether to peek or keep. Because both peeking and keeping provide identical information, the decision to peek or keep should be a function of one's expectations of the option's outcomes. For example, if the option is believed to only produce positive outcomes, then one should always keep. On the other hand, if one believes that the option has a high probability of producing a negative outcome, or even a low probability of producing a high magnitude negative outcome, then one may decide to avoid the risk of keeping and decide to peek.
+  if(is.na(kink)) {kink <- total.trials * .5}
+  
+  output <- exp((trial / kink) ^ c * expectations) / sum(exp((trial / kink) ^ c * expectations))
+  
+return(output)
 
-Because both the perceived probability of a negative outcome, and the expectation of an option could dictate actions, we developed two potential action functions. We assume that an individual will use one of these functions and not both.
+}
 
-\subsubsubsection{Probability of a negative outcome}
+c.seq <- seq(0, 4, length.out = 4)
+col.fun <- colorRamp2(breaks = c(min(c.seq), max(c.seq)), colors = c("blue", "red"), transparency = .3)
+
+plot(1, type = "n", xlab = "trial", 
+     ylab = "Select A Prob", xlim = c(0, 100), ylim = c(.4, 1),
+    main = "Softmax Selection Rule")
+
+for(c.i in c.seq) {
+
+  
+select.a.probs <- unlist(lapply(1:100, function(x) {sm.select.fun(trial = x, 
+                    expectations = c(2, 1), 
+                    c = c.i,
+                    total.trials = 100)[1]}))
+
+lines(1:100, 
+      select.a.probs,
+      col = col.fun(c.i)
+      )
+
+}
+
+legend("bottomright", legend = paste("c = ", round(c.seq, 2)),
+       col = col.fun(c.seq),
+       lty = 1,
+       cex = .5
+       )
+
+mtext("E(A) = 2, E(B) = 1", side = 3)
+
+@
+
+
+\subsection{Action}
+
+Once an option is selected, the decision maker decides whether to peek or keep. We propose three different models that could drive this decision. Each model focuses on a particular statistic of the selected option.
+
+\subsubsection{Probability of a negative outcome}
 
 The first action function predicts that people will keep an option as a decreasing function of the perceived probability that the next outcome will be negative:
 
@@ -144,31 +219,173 @@ The first action function predicts that people will keep an option as a decreasi
 \begin{equation}
 \label{eq:actionpneg}
 
-Pr(Keep_{t})= 1 - e^{N_{j} \times \frac{1}{N_{tol}}
+Pr(Keep_{t})= \frac{1}{1 + e^{\alpha \times (\beta_{t} - \gamma)}}
 
 \end{equation}
 \end{center}
 
-The sensitivity of the function to the perceived probability of a negative outcome is given by the negativity tolerange parameter $N_{tol}$. The larger $N_{tol}$ is, the more tolerant people are of negative outcomes and the more likely they are to keep. The smaller $N_{tol}$ is, the less tolerant peopel are of negative outcomes and the less likely they are to keep.
+Each parameter is defined as follows: $\alpha$ falls in the range [0, Inf] and is the sensitivity to differences in perceived probability of negative outcomes. When $\alpha$ is 0, changes in perceived probability of obtaining negative outcomes does not affect action decisions. When $\alpha$ is very large, small differences in the perceived probability of drawing a negative outcome dramatically change action decisions. $\beta_{t}$ falls in the range [0, 1] and is the perceived probability of observing a negative outcome from the selected option at trial t. $\gamma$ falls in the range [-Inf, Inf] and represents is the overall tolerance for keeping negative outcomes. Specifically, $\gamma$ represents the perceived probability of sampling a negative outcome where the decision maker is equally likely to keep or peek. When $\gamma$ is negative, people are always more likely to peek than keep, while when $\gamma$ is greater than 1, people are always more likely to keep than peek.
 
-\subsubsubsection{Expectations}
+From this setup, an unbiased agent that always keeps when the perceived probability of a negative value is less than .5, and always peeks when the perceived probability of a negative value is greater than .5 can be represented by having $\gamma$ = .5 and $\alpha$ = Inf.
 
-The second action function predicts that people will keep an option as an increasing function of the expections of options. When expectations are negative, the probability of keeping will always be less than 0.50 and when expectations are positive the probability will be greater than 0.50:
+A graph showing keep probabilities for different levels of these parameters is presented in Figure~\ref{fig:actionpneg}
+
+<<echo = F, results = 'hide'>>=
+pdf("keepneg.pdf", width = 6, height = 6)
+
+keep.neg.fun <- function(pneg, neg.tol = .5, neg.sens = .1) {
+
+return(1 / (1 + exp(neg.sens * (pneg - neg.tol))))
+
+}
+
+gamma.seq <- seq(-1, 2, length.out = 5)
+alpha.seq <- c(.1, 2, 4, 10)
+require("circlize")
+
+par(mar = c(4, 4, 3, 1))
+par(mfrow = c(2, 2))
+
+
+for(alpha.i in alpha.seq) {
+
+plot(1, type = "n", xlab = "pneg", 
+     ylab = "Keep Prob", xlim = c(0, 1), ylim = c(0, 1),
+    main = paste("Alpha = ", alpha.i, sep = ""))
+
+for(gamma.i in gamma.seq) {
+
+col.fun <- colorRamp2(breaks = c(-1, 2), colors = c("blue", "red"),
+transparency = .3 )
+  
+lines(seq(0, 1, .1), 
+      keep.neg.fun(seq(0, 1, .1), 
+      neg.tol = gamma.i, 
+      neg.sens = alpha.i),
+      col = col.fun(gamma.i))
+
+}
+
+legend("right", legend = paste("gamma = ", gamma.seq),
+       col = col.fun(gamma.seq),
+       lty = 1,
+       cex = .5, bg = "white"
+       )
+
+}
+
+dev.off()
+@
+
+\begin{center}
+\begin{figure}
+\includegraphics[width=12cm]{keepneg.pdf}
+\caption{Probability of keeping as a function of the perceived probability of obtaining a negative sample (pneg), sensitivity to perceived differences in the probability of obtaining a negative outcome (gamma), and overall bias towards keeping (alpha).}
+\label{fig:actionpneg}
+\end{figure}
+\end{center}
+
+
+\subsubsection{Expectations}
+
+The second action function predicts that people will keep an option as an increasing function of the expectations of options. The model has two parameters: $\alpha$, which dicates the expectation value at which people are equally likely to peek or keep, and $\gamma$, the degree to which people are deterministic in their decision to peek or keep for a given expectation.
 
 \begin{center}
 \begin{equation}
 \label{eq:actionexpectation}
 
-Pr(Keep_{t})= \frac{1}{1 + e^{-E_{j} \times \gamma}}
+Pr(Keep_{t})= \frac{1}{1 + e^{-(E_{j} - \alpha} \times \gamma}}
 
 \end{equation}
 \end{center}
 
-Equation \ref{eq:actionexpectation} contains a sensivitiy parameter $\gamma$ which dictates how sensitive people are to current expectations in deciding which action to take. As $\gamma$ increases, participants are more likely to keep an option with a positive expectation, and peek at an option with a negative expectation.
+$E_{j}$ falls in the range [-Inf, Inf] and is the expectation of option j at the current trial. $\alpha$ falls in the range [-Inf, +Inf], and is the indifference point (the expectation value at which the person is equally likely to peek or keep). As $\alpha$ increases, people are generally more likely to peek. $\gamma$ falls in the range [0, +Inf] and is the sensitivity to differences in expectations close to the indifference point. As $\gamma$ increases, people are much more deterministic in their decision to peek or keep. A graph of this function is presented in Figure~\ref{fig:actionexp}
+
+<<echo = F, results = 'hide'>>=
+pdf("keepexp.pdf", width = 9, height = 3)
+
+keep.exp.fun <- function(exp, gamma = 1, alpha) {
+
+return(1 / (1 + exp(-(exp - alpha) * gamma)))
+
+}
+
+gamma.seq <- seq(0, 5, length.out = 5)
+alpha.seq <- c(-2, 0, 2)
+
+require("circlize")
+
+par(mar = c(4, 4, 3, 1))
+par(mfrow = c(1, 3))
+
+for(alpha.i in alpha.seq) {
+
+plot(1, type = "n", xlab = "Expectation", 
+     ylab = "Keep Prob", xlim = c(-5, 5), ylim = c(0, 1),
+    main = paste("Alpha = ", alpha.i, sep = ""))
+
+for(gamma.i in gamma.seq) {
+
+col.fun <- colorRamp2(breaks = c(min(gamma.seq), max(gamma.seq)), 
+                      colors = c("blue", "red"),
+                      transparency = .3 )
+  
+lines(seq(-5, 5, .1), 
+      keep.exp.fun(seq(-5, 5, .1), 
+      gamma = gamma.i, alpha = alpha.i),
+      col = col.fun(gamma.i))
+
+
+legend("right", legend = paste("gamma = ", gamma.seq),
+       col = col.fun(gamma.seq),
+       lty = 1,
+       cex = .5, bg = "white"
+       )
+
+}
+}
+
+dev.off()
+@
+
+\begin{center}
+\begin{figure}
+\includegraphics[width=12cm]{keepexp.pdf}
+\caption{Probability of keeping as a function of the expectation of an option (exp), an overall bias towards keeping (alpha), and choice consistency (gamma)}
+\label{fig:actionexp}
+\end{figure}
+\end{center}
+
+
+\subsubsection{Uncertainty}
+
+The third action function predicts that people will keep an option as decreasing function of the uncertainty associated with the option. We define uncertainty in one of 3 ways
+
+\begin{itemize}
+  \item Sample standard deviation
+  \item Number of prior samples of the option
+  \item Standard error of the option
+\end{itemize}
+
+The three models corresponding to each of these measures of uncertainty each have one parameter: $\alpha$, which dicates recency effects. As $\alpha$ increases, participants are increasingly more sensitive to recent outcomes in their action decisions. Like models of expectation updating (see future section), we assume that people update their measures of uncertainty as a weighted function of their previous uncertainty measure and new values:
+
+\begin{center}
+\begin{equation}
+\label{eq:uncertaintyupdatingmodels}
+
+U_{j}(t)=U_{j}(t-1)+\alpha \times [y(t) - U_{j}(t-1)]
+
+\end{equation}
+\end{center}
+
+where $U_{j}{t}$ is the uncertainty at trial t, $U_{j}(t-1)$ is the uncertainty on the previous trial, y(t) is the observed uncertainty at trial j, and $\alpha$ is the recency parameter.
+
+The definition of $y(t)$ depends on the specific definition of uncertainty
+
 
 \subsection{Updating}
 
-After an option has been selected and acted upon, the decision maker updates her expectations of the selected option. We follow previous research \citep{yechiam2005models} and assume that expectationa are updated as a function of prior expectations and the newly observed value:
+After an option has been selected and acted upon, the decision maker updates her expectations of the selected option. We follow previous research \citep{yechiam2005models} and assume that expectations are updated as a function of prior expectations and the newly observed value:
 
 \begin{center}
 \begin{equation}
@@ -179,12 +396,11 @@ E_{j}(t)=E_{j}(t-1)+\alpha \times [v(t) - E_{j}(t-1)]
 \end{equation}
 \end{center}
 
-where $\alpha$ is the updating parameter with a support of [0, 1]. When $\alpha$ is close to 0, expectations do not change much after each obsevation. When $\alpha$ is close to 1, expectations are strongly influenced by recent outcomes.
+where $\alpha$ is the updating parameter with a support of [0, 1]. When $\alpha$ is close to 0, expectations do not change much after each observation. When $\alpha$ is close to 1, expectations are strongly influenced by recent outcomes.
 
 We leave open the possibility for different values of $\alpha$ for different actions. For example, one could have a large recency effect and fast updating for keep actions, and low recency effects and slow updating for peek actions. We will test these assumptions in our data.
 
 \subsection{Action-Selection-Updating Model}
-
 
 The ASU model assumes that people can be in one of two mutually exclusive action states: exploration or exploitation. When people are in an exploration state, they only peek and when they are in an exploitation state they only keep. The probability that people are in an exploration state depends on the current trial and the time since their previous exploration state. We assume that people are more likely to be in an exploration state on earlier trials than later trials, and that people are increasingly more likely to be in an exploitation state the longer it has been since their last exploitation state.
 
@@ -203,36 +419,52 @@ Pr(S(t)=0|S(t-1) = 1)= \frac{1}{1 + e^{-t \times \gamma - \beta}}
 
 where t is the current trial number, $\beta$ is the number of trials since the previous observation state. 
 
-<<echo = F>>=
+<<echo = F, fig.width = 9, fig.height = 3>>=
 
 switch.to.explore.fun <- function(
                                   trial, # Current trial
-                                  gamma = 1, # Bias towards exploitation state
+                                  gamma = 1, # Bias towards exploitation state [-Inf, Inf]
                                   beta = 1, # Trials since previous exploitation state
                                   n.trials = 100, # Total Trials,
-                                  kink = 50
-                                  
+                                  kink = 50 # Kink in function (location of .50)
                                   ) {
   
   return(1 / (1 + exp(-((beta + trial - kink) / n.trials * gamma))))
   
 }
 
+par(mfrow = c(1, 3))
 
-plot(5:100, ylim = c(0, 1), type = "n")
+for (beta.i in floor(seq(0, 50, length.out = 3))) {
 
-for (i in 1:8) {
+plot(5:100, ylim = c(0, 1), 
+     type = "n", 
+     main = paste("Trials since previous explore = ", beta.i, sep = ""),
+     xlab = "Current Trial",
+     ylab = "p(explore)"
+     )
 
-lines(1:100, switch.to.explore.fun(1:100, beta = i, gamma = 4, kink = 40), lwd = i)
+bias.seq <- seq(-10, 10, 5)
+col.vec <- gray(seq(.1, .9, length.out = length(bias.seq)))
+
+for (i in 1:length(bias.seq)) {
+
+lines((floor(beta.i)):100, switch.to.explore.fun((floor(beta.i)):100, gamma = bias.seq[i], beta = beta.i, kink = 40), col = col.vec[i])
   
   }
+
+legend("right", 
+       legend = paste("gamma = ", bias.seq, sep = ""),
+       lty = 1,
+       col = col.vec
+       )
+
+}
 
 
 
 
 @
-
-
 
 
 If you are currently in an exploration state on trial (t-1), then the probability you will switch to an exploitation state on trial (t) is giving by
@@ -245,7 +477,6 @@ Pr(State=Exploit{t} | Previous state is explore)= 1-\frac{1}{1 + e^{-runs \times
 
 \end{equation}
 \end{center}
-
 
 
 <<echo = F, eval = F>>=
@@ -561,19 +792,16 @@ plot(1, xlim = c(0, max.trials), ylim = c(min.exp, max.exp), xlab = "Trial", yla
 }
   
   
-  
-  
-  
-  
-  
+
   }
 
 
 ## Konstanz Game Simulation
 kg.sim <- function(
                     gamble.pdf = list(  # distributions of each option
-                                      rnorm(10000, 0, 1),
-                                      rnorm(10000, .5, 3)
+                                      rnorm(10000, -20, 20),
+                                      rnorm(10000, 0, 20),
+                                      rnorm(10000, 20, 20)
                                       ),
                     sampling.method = "random", # sampling is either random or sequential
                     n.trials = 100,   # Total trials in game
@@ -666,8 +894,8 @@ kg.sim <- function(
     if(sampling.method == "random") {outcome.i <- sample(selected.gamble.pdf, size = 1)}
     if(sampling.method == "sequential") {
       
-      outcome.i <- selected.gamble.pdf[1]
-      gamble.pdf[[selection.i]] <- gamble.pdf[[selection.i]][-1]
+      outcome.i <- selected.gamble.pdf[[result$trial[i]]]
+ #     gamble.pdf[[selection.i]] <- gamble.pdf[[selection.i]][-1]
     
     
     }
@@ -729,18 +957,19 @@ kg.sim <- function(
 
 <<eval = F, echo = F>>=
 
-
 # Examples
 
-kg.sim(gamble.pdf = list(rnorm(1000, .5, 1), 
-                         c(rnorm(900, 1, 1), rnorm(100, -50, 1))
-                         ),
+kg.sim(gamble.pdf = list(rnorm(200, -10, 30),
+                        c(rnorm(100, 0, 30), rnorm(100, 0, 10)),
+                        c(rnorm(100, 10, 10), rnorm(100, 10, 30))
+                        ),
        action.method = "trial",
        action.pars = -2,
-       plot.lag = 10,
+       plot.lag = 20,
        selection.pars = 0,
-       update.pars = c(.2, .8)
-       
+       update.pars = c(.4, .4),
+       sampling.method = "sequential",
+       n.trials = 200
        )
 
 @
