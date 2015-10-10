@@ -1,0 +1,262 @@
+"workerid"	"turk.reward"	"turk.reward.message"
+"1"	"A100VV1V2XDQI7"	0.66	"You earned 659 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.66"
+"2"	"A10P238L5ZBHZ"	0	NA
+"3"	"A10T9C9WY488DY"	0.01	"You earned 13 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.01"
+"4"	"A12O9P1OTMJOPW"	0.75	"You earned 747 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.75"
+"5"	"A139DFNZS0I9RB"	0.02	"You earned 18 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.02"
+"6"	"A14P3ZTCQI6B3S"	0	NA
+"7"	"A14VY6QXKBLC0D"	0.38	"You earned 385 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.38"
+"8"	"A15LHHN76OW2UM"	0	NA
+"9"	"A15SPRQ2HRRZMQ"	0.31	"You earned 308 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.31"
+"10"	"A15WYFI0T9Q41"	0.1	"You earned 95 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.1"
+"11"	"A16QMHXE8G3ATJ"	0	NA
+"12"	"A17KZPGCY7PACK"	0.17	"You earned 166 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.17"
+"13"	"A17M0M8JML4I4G"	0	NA
+"14"	"A18MC27WTCEBA2"	0	NA
+"15"	"A190VSP1NFNBR9"	0	NA
+"16"	"A195MOXRMNHRVT"	0.32	"You earned 321 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.32"
+"17"	"A1A3TGZ7DKJWRW"	0.69	"You earned 693 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.69"
+"18"	"A1AA6392Z0OBNN"	0	NA
+"19"	"A1AV4GDVK0IT7O"	1	"You earned 998 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 1"
+"20"	"A1B4WL7N3ACF2T"	0.8	"You earned 798 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.8"
+"21"	"A1BN0AWHF34FCG"	0.82	"You earned 823 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.82"
+"22"	"A1C0P72V4V16QN"	0.31	"You earned 311 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.31"
+"23"	"A1DUH3RLI00YQM"	0.07	"You earned 70 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.07"
+"24"	"A1EFWWVL8VQWY8"	0.2	"You earned 198 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.2"
+"25"	"A1ETJBNTO9ZWZ8"	0.06	"You earned 61 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.06"
+"26"	"A1FFZDNSXL5MXF"	0.02	"You earned 17 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.02"
+"27"	"A1GABEPSX2V15F"	0	NA
+"28"	"A1GAKTZ7E5Y3K2"	0.03	"You earned 32 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.03"
+"29"	"A1GI2WLBQP4D0N"	0.12	"You earned 120 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.12"
+"30"	"A1GTHD6VEY97JO"	0	NA
+"31"	"A1GWHGTBM3QMQ3"	0.97	"You earned 968 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.97"
+"32"	"A1HU67YR5SX857"	0	NA
+"33"	"A1HZJEDSWRG10C"	0.25	"You earned 250 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.25"
+"34"	"A1IW2J12KSHGW2"	0	NA
+"35"	"A1J9E3GO9MDB1J"	0.3	"You earned 297 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.3"
+"36"	"A1JIE006HKPBIA"	0.17	"You earned 168 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.17"
+"37"	"A1JV64BL3WCK0G"	0.64	"You earned 640 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.64"
+"38"	"A1K0T4P6HV4NJQ"	0	"According to our records, you played The Boxes Game more than once. For this reason, you are not eligible for a bonus. If you have any questions, please contact us at turkpsych@gmail.com"
+"39"	"A1KBGTQEVTVMJU"	0	NA
+"40"	"A1KF05U5IO9AFG"	0.38	"You earned 380 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.38"
+"41"	"A1KGCOR8OXYR72"	0.3	"You earned 295 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.3"
+"42"	"A1KHK2C32M9BER"	0.06	"You earned 56 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.06"
+"43"	"A1KRO0JWU6LT0I"	0	NA
+"44"	"A1LBG9MI3ODUZX"	0	NA
+"45"	"A1LI3JQS2VBOXC"	0	NA
+"46"	"A1LMQ2Z7V0O1L0"	0.2	"You earned 201 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.2"
+"47"	"A1LVAHYYH7TGN2"	0.43	"You earned 428 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.43"
+"48"	"A1M1TSMJB12177"	0.42	"You earned 422 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.42"
+"49"	"A1MEONKK3AJGNK"	0	NA
+"50"	"A1NJ0J3SCP668A"	0.77	"You earned 774 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.77"
+"51"	"A1NK6UXWXKFMC7"	0	NA
+"52"	"A1O2D67U4IBFS7"	0.16	"You earned 157 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.16"
+"53"	"A1OXO6ZJI14IWZ"	0.17	"You earned 167 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.17"
+"54"	"A1P1K4M8P9EQ5T"	0.93	"You earned 934 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.93"
+"55"	"A1P8M5BKOTAA8I"	0.14	"You earned 144 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.14"
+"56"	"A1POQWMOWKNQCN"	0.52	"You earned 519 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.52"
+"57"	"A1Q9NMVO8HTX8H"	0	NA
+"58"	"A1QUNP6IYOQMZ5"	0.53	"You earned 527 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.53"
+"59"	"A1R5TGEFPN0VP3"	0.23	"You earned 227 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.23"
+"60"	"A1R93MQYAFEVX1"	0.06	"You earned 65 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.06"
+"61"	"A1RC2PD0YJFCU8"	0.04	"You earned 35 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.04"
+"62"	"A1S7H2HZ5NAS3H"	0	NA
+"63"	"A1SZ6HYKSDYGEV"	0	NA
+"64"	"A1T3LMVKIUR9OE"	0	NA
+"65"	"A1TAY5098KV4NN"	0	NA
+"66"	"A1TK0ZMZ571GG0"	0.46	"You earned 460 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.46"
+"67"	"A1TNAGP7EP3051"	0.6	"You earned 597 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.6"
+"68"	"A1U3Q2FXW1VET1"	0	NA
+"69"	"A1UL0HQUZQPMSX"	0.74	"You earned 738 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.74"
+"70"	"A1V0L5FYLMAHTG"	0.95	"You earned 950 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.95"
+"71"	"A1W4Q0E00VP6VD"	0	NA
+"72"	"A1WH32GYQOHIRQ"	0.19	"You earned 192 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.19"
+"73"	"A1XMFODRPFWKJ7"	0.09	"You earned 91 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.09"
+"74"	"A1YJTIKGNQBXB3"	0	NA
+"75"	"A1YM0IWPC72J7V"	0.64	"You earned 635 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.64"
+"76"	"A1YW2N1HLYL8YK"	0.02	"You earned 25 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.02"
+"77"	"A1ZBCPFZH8XT7X"	0.19	"You earned 188 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.19"
+"78"	"A1ZPF2GZ6PHBDA"	0.13	"You earned 128 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.13"
+"79"	"A1ZR0Q2OUOLW51"	0	NA
+"80"	"A1h8fu8g2iptwr"	0	NA
+"81"	"A20GSC7RIS8188"	0	NA
+"82"	"A20IA63WXHF683"	0.23	"You earned 230 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.23"
+"83"	"A21K0YL66NDA42"	0	NA
+"84"	"A22HX7JGLXHJQG"	0.8	"You earned 795 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.8"
+"85"	"A22MNN3ZTBSAY3"	0.08	"You earned 78 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.08"
+"86"	"A22ZVWOXT5JNNU"	0.27	"You earned 266 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.27"
+"87"	"A238WZ5QFBJME1"	0	NA
+"88"	"A23C0K84LJ5ZV3"	0	"According to our records, you played The Boxes Game more than once. For this reason, you are not eligible for a bonus. If you have any questions, please contact us at turkpsych@gmail.com"
+"89"	"A249KXEUUGKIXD"	0.8	"You earned 804 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.8"
+"90"	"A24F80I9XHQP03"	0.14	"You earned 141 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.14"
+"91"	"A25APBYG5DTMTW"	0	NA
+"92"	"A263CRI673K4QG"	1	"Unfortunately there was a computer error when you played The Boxes Game. For this reason, you are receiving the maximum possible bonus of $1.00. We apologize for the error!"
+"93"	"A266KTWY0HBD2F"	0.28	"You earned 282 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.28"
+"94"	"A26X054UJOBN6K"	0.5	"You earned 498 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.5"
+"95"	"A26ZENZ5G8AEGM"	0.62	"You earned 625 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.62"
+"96"	"A27IUQDZPHETTP"	0	NA
+"97"	"A27O2IILV3S5YS"	0	NA
+"98"	"A27UJAUWW4OSAG"	0	NA
+"99"	"A28PS7TGEQCFT4"	0.18	"You earned 180 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.18"
+"100"	"A28T8M1DBYTUQA"	0.43	"You earned 426 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.43"
+"101"	"A29OJFPXJP5ODV"	0.1	"You earned 103 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.1"
+"102"	"A2A3X2W4YS9X8A"	0.56	"You earned 564 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.56"
+"103"	"A2A8HRBDYBV6XJ"	0.02	"You earned 15 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.02"
+"104"	"A2B533B7Y6Q0ID"	0	NA
+"105"	"A2BK45LZGGWPLX"	0.1	"You earned 102 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.1"
+"106"	"A2BQSNRTCV8XQ4"	0.12	"You earned 115 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.12"
+"107"	"A2BWFEGDD44WXL"	0	NA
+"108"	"A2CCSFYX3X4ECB"	0	NA
+"109"	"A2CS48CU9FUM4A"	0.14	"You earned 143 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.14"
+"110"	"A2CVMLOH19SL5X"	0.47	"You earned 466 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.47"
+"111"	"A2DIINP8HJJ2BW"	0	"According to our records, you played The Boxes Game more than once. For this reason, you are not eligible for a bonus. If you have any questions, please contact us at turkpsych@gmail.com"
+"112"	"A2ED3OFN0R54UA"	0	NA
+"113"	"A2EPI9A2N9OP3J"	0.04	"You earned 42 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.04"
+"114"	"A2FW4EDFF6H40P"	0.12	"You earned 116 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.12"
+"115"	"A2GIJ8E45BSAI"	0.68	"You earned 676 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.68"
+"116"	"A2H1QUGX0SOUMH"	0.04	"You earned 41 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.04"
+"117"	"A2H9YNTDHIHS1U"	0	NA
+"118"	"A2HV9CYJH2IQYE"	0.13	"You earned 131 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.13"
+"119"	"A2J237J8KM3OCS"	0.73	"You earned 733 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.73"
+"120"	"A2JG1NAFYN2PMJ"	0.18	"You earned 178 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.18"
+"121"	"A2JP5VBC549DHF"	0.43	"You earned 432 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.43"
+"122"	"A2K0ZIL8MS0N3E"	0.08	"You earned 77 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.08"
+"123"	"A2KA1H6AA3Y80G"	0.4	"You earned 399 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.4"
+"124"	"A2KH7SE6NBL2WQ"	0.35	"You earned 347 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.35"
+"125"	"A2L73JKDFWI0KJ"	0.78	"You earned 775 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.78"
+"126"	"A2LQIMNL9U9KN7"	0.11	"You earned 113 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.11"
+"127"	"A2MG1LLIKMGAMX"	0.87	"You earned 873 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.87"
+"128"	"A2MH8TOELFTCES"	0.11	"You earned 113 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.11"
+"129"	"A2MUR0MDDWK4TY"	0.39	"You earned 390 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.39"
+"130"	"A2NDA88F1EZWEH"	0.59	"You earned 591 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.59"
+"131"	"A2OSXVGQUR6IL6"	0	NA
+"132"	"A2P6VK1US8OTC5"	0.1	"You earned 102 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.1"
+"133"	"A2P76QVLSGJR45"	0.34	"You earned 343 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.34"
+"134"	"A2PAP6WAU1OLNH"	0.43	"You earned 431 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.43"
+"135"	"A2PF32ET8Z1YEB"	0.24	"You earned 237 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.24"
+"136"	"A2QQY4S73JO639"	0	NA
+"137"	"A2QWVKYC4RSJKM"	0	NA
+"138"	"A2RB4WF5CDMEL9"	0.29	"You earned 290 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.29"
+"139"	"A2RR3B1I2Z7NS7"	0.26	"You earned 261 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.26"
+"140"	"A2T5SWA51PFGQZ"	0	NA
+"141"	"A2TJVARJ3154YE"	0	NA
+"142"	"A2TT6FAIWFD25N"	0.58	"You earned 579 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.58"
+"143"	"A2U7BMG19Q83GE"	0	NA
+"144"	"A2UHK8HUXXMSVM"	0	NA
+"145"	"A2V2I8HXL9EHQ1"	0.44	"You earned 439 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.44"
+"146"	"A2VL4NTRZCSXK"	0.53	"You earned 529 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.53"
+"147"	"A2W547SNOCMC25"	0	NA
+"148"	"A2WZDY9R2GHRXD"	0.14	"You earned 138 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.14"
+"149"	"A2Y7BO0CROURI4"	0	"According to our records, you played The Boxes Game more than once. For this reason, you are not eligible for a bonus. If you have any questions, please contact us at turkpsych@gmail.com"
+"150"	"A2YGEOO74PF79Y"	0.07	"You earned 72 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.07"
+"151"	"A2YJ7VTG3Y84ML"	0.8	"You earned 805 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.8"
+"152"	"A2YNN8T8ROWHES"	0.58	"You earned 577 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.58"
+"153"	"A2ZRF4I5RTKN7G"	0.3	"You earned 302 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.3"
+"154"	"A2ZV96GRXVSXK4"	0	NA
+"155"	"A301OC6DURSQ5W"	0.31	"You earned 313 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.31"
+"156"	"A30QRUEU84M6EU"	0.15	"You earned 154 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.15"
+"157"	"A31A20Z5P0UJBH"	0.26	"You earned 255 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.26"
+"158"	"A31Q7PWLBCU2X0"	0.12	"You earned 121 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.12"
+"159"	"A324FQ64NCN2YS"	0	NA
+"160"	"A32ZTTN3F4XKBA"	0.24	"You earned 244 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.24"
+"161"	"A33QI63NVR8CUO"	0.03	"You earned 26 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.03"
+"162"	"A34XI67018IK8"	0	NA
+"163"	"A36MTY8RSWBZU7"	0.35	"You earned 347 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.35"
+"164"	"A36O6HV8LCXLJR"	0.83	"You earned 831 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.83"
+"165"	"A37AJI03M37NPJ"	0.01	"You earned 6 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.01"
+"166"	"A37FQI6S9XARBT"	0.1	"You earned 99 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.1"
+"167"	"A37QZIPI5JW6Q9"	0.59	"You earned 590 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.59"
+"168"	"A37S96RT1P1IT2"	0.03	"You earned 33 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.03"
+"169"	"A382OV019QLW6H"	0	NA
+"170"	"A38A3MULFDOZ69"	0.06	"You earned 59 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.06"
+"171"	"A38HODAQUKJKKS"	0.22	"You earned 219 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.22"
+"172"	"A38PKJM1ZRMDT8"	0.04	"You earned 37 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.04"
+"173"	"A38R23YJWI0B4P"	1	"Unfortunately there was a computer error when you played The Boxes Game. For this reason, you are receiving the maximum possible bonus of $1.00. We apologize for the error!"
+"174"	"A38ZV8LBZ034IZ"	0.34	"You earned 336 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.34"
+"175"	"A390GZR4Y99EP9"	0.05	"You earned 51 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.05"
+"176"	"A39RGARQZH9C9J"	0	NA
+"177"	"A3B1TMUY2L187E"	0.08	"You earned 84 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.08"
+"178"	"A3CP90T5BS4AIB"	0	NA
+"179"	"A3EH4H6SCWAE6F"	0	NA
+"180"	"A3ESC1H6BBKF30"	0	NA
+"181"	"A3F0NFNLOLFJT0"	0.5	"You earned 503 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.5"
+"182"	"A3F2GS1KMWW6CP"	0	NA
+"183"	"A3F6SDO4GYBE4Y"	0.65	"You earned 651 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.65"
+"184"	"A3FJCLBK3HF4PD"	0	NA
+"185"	"A3FW9NWR6TJ4M9"	0	NA
+"186"	"A3G8NSPRF986WP"	0.13	"You earned 128 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.13"
+"187"	"A3HEFMJ50IMTY6"	0	NA
+"188"	"A3ICWVGCEDRXS0"	0.59	"You earned 589 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.59"
+"189"	"A3IMND1XWD1O98"	0.07	"You earned 72 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.07"
+"190"	"A3J9ORWWVZCEOI"	0	NA
+"191"	"A3JSU8FCFPXZPE"	0.48	"You earned 477 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.48"
+"192"	"A3K3IZ0S0YOLO1"	0.37	"You earned 373 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.37"
+"193"	"A3KU8E8FA2184N"	0.22	"You earned 218 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.22"
+"194"	"A3KZ4L1CTETPGP"	0	NA
+"195"	"A3L2VS3998R77L"	0.36	"You earned 362 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.36"
+"196"	"A3LN9BVLOWLYER"	0.16	"You earned 159 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.16"
+"197"	"A3LV60O7E3XAN4"	0.07	"You earned 67 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.07"
+"198"	"A3N8JP3QR3VPE8"	1	"Unfortunately there was a computer error when you played The Boxes Game. For this reason, you are receiving the maximum possible bonus of $1.00. We apologize for the error!"
+"199"	"A3NR6IMZRCIDGW"	0	NA
+"200"	"A3ON3DL1CKGN4E"	0.06	"You earned 57 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.06"
+"201"	"A3PMGUAC5XHORQ"	0.45	"You earned 453 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.45"
+"202"	"A3PUU1XU4C1A3V"	0.6	"You earned 597 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.6"
+"203"	"A3QJJR5Y3XE92N"	0.72	"You earned 723 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.72"
+"204"	"A3RD1GEZTSDS4X"	0.63	"You earned 634 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.63"
+"205"	"A3RGDXZ76VHKZG"	0.24	"You earned 240 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.24"
+"206"	"A3RHGIM99R25Q9"	0.95	"You earned 951 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.95"
+"207"	"A3RNYHTTJZ6JUP"	0.34	"You earned 336 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.34"
+"208"	"A3RWPOO10DUH6V"	0	NA
+"209"	"A3T021IZ1409ZH"	0.7	"You earned 697 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.7"
+"210"	"A3UUUI3JQIGG7O"	0.59	"You earned 589 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.59"
+"211"	"A3VO3NT62HDMQ9"	0.17	"You earned 172 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.17"
+"212"	"A3VYSIS1WIAUCU"	0	NA
+"213"	"A3W4QQ3FSGV3ID"	0.5	"You earned 498 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.5"
+"214"	"A40W0EWYGHNV0"	0.12	"You earned 118 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.12"
+"215"	"A5MZPF0UJ2TXJ"	0	"According to our records, you played The Boxes Game more than once. For this reason, you are not eligible for a bonus. If you have any questions, please contact us at turkpsych@gmail.com"
+"216"	"A6B8DOH3KV5SL"	0	NA
+"217"	"A6K0MH7ES5NFO"	0.19	"You earned 189 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.19"
+"218"	"A6T7JD3FQ5Y4C"	0	NA
+"219"	"A711OL0JT1XWB"	0	NA
+"220"	"A8Q4T87YRWY89"	0	NA
+"221"	"A8ZUYKK47MVUQ"	0.04	"You earned 35 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.04"
+"222"	"A99PQSI7FTY50"	0.47	"You earned 467 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.47"
+"223"	"A9L9G563HS81X"	0.55	"You earned 547 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.55"
+"224"	"A9MJVJAMLCDMV"	0.06	"You earned 59 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.06"
+"225"	"AA0QKSSEQ0B6Q"	0	NA
+"226"	"AAGGGAJDJLZE4"	0.28	"You earned 279 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.28"
+"227"	"AAXYYH9MI3PJM2"	0.21	"You earned 210 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.21"
+"228"	"AC5UD8N187QD6"	0.63	"You earned 634 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.63"
+"229"	"AD2JL6BFSL5UF"	0.24	"You earned 243 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.24"
+"230"	"ADOB8J5ANJLQW"	0	"According to our records, you played The Boxes Game more than once. For this reason, you are not eligible for a bonus. If you have any questions, please contact us at turkpsych@gmail.com"
+"231"	"ADVZAZ12Z8N9J"	0.13	"You earned 129 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.13"
+"232"	"AEY0183LLRYUX"	0.39	"You earned 386 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.39"
+"233"	"AF33681RI3ES8"	0.01	"You earned 11 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.01"
+"234"	"AFWKRID53R1XA"	0.63	"You earned 631 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.63"
+"235"	"AH31QLJ57XC8W"	0.28	"You earned 285 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.28"
+"236"	"AHXE36JW3AY4J"	0.22	"You earned 225 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.22"
+"237"	"AI4NNFCA7YVGP"	0	NA
+"238"	"AIDU9BF0OZLBL"	0.17	"You earned 167 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.17"
+"239"	"AIPLQP4TXMFHO"	0.03	"You earned 28 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.03"
+"240"	"AIT2938FA7SOH"	0	NA
+"241"	"AK7OWBZVKPS5Q"	0.84	"You earned 842 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.84"
+"242"	"AL34XQQW441B2"	0	NA
+"243"	"AL9R6CILUG30X"	0.25	"You earned 252 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.25"
+"244"	"ANVXAMUEBGV8N"	0.15	"You earned 150 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.15"
+"245"	"AOCX1V412ZRFC"	0	NA
+"246"	"APQMFEY1KUL6A"	0.1	"You earned 101 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.1"
+"247"	"AR0U3KQNIT2G5"	0.21	"You earned 211 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.21"
+"248"	"ARQA90W3DRJCB"	0.54	"You earned 539 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.54"
+"249"	"ASKENT3CGE0VF"	0.06	"You earned 60 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.06"
+"250"	"ASRI4XGCPE999"	0.46	"You earned 461 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.46"
+"251"	"AT6ZE641N7W4D"	0	NA
+"252"	"ATQKHNTLW7O3I"	0	NA
+"253"	"AU7A3QNJF3O00"	0.37	"You earned 373 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.37"
+"254"	"AUI3R928P63B0"	0.09	"You earned 89 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.09"
+"255"	"AVMIXXCHPD291"	0	NA
+"256"	"AW20BA38TBP8O"	0.07	"You earned 70 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.07"
+"257"	"AWPPIW21DGL29"	0	NA
+"258"	"AXCPRXO08DFAH"	0.22	"You earned 221 points in The Boxes Game. At 1 cent for every 10 points, this means you earned a bonus of 0.22"
+"259"	"AYSG3J2U3UF1Y"	0	NA
+"260"	"AZF5L5E93FGW0"	0	NA
+"261"	"AZGOCLAHG5WK3"	0	NA
