@@ -8,17 +8,17 @@ sampling.method <- "unstructured"
 # sample mean and standard deviations are within this threshold of the parameter values
 
 N <- 100
-mean.thresh <- .05
-median.thresh <- .05
+mean.thresh <- .01
+median.thresh <- .01
 sd.thresh <- 1
+ppos.thresh <- .01
 
 # Define the environments
 
 environments <- c(
-  "N,5,5; N,-5,5",
-  "N,5,20; N,-5,20",
-  "N,5,5; N,-5,5; N,-5,5; N,-5,5",
-  "N,5,20; N,-5,20; N,-5,20; N,-5,20"
+  "N,5,12; N,-5,12",
+  "N,5,12; N,-5,12; N,-5,12; N,-5,12",
+  "N,5,12; N,-5,12; N,-5,12; N,-5,12; N,-5,12; N,-5,12"
   )
 
 
@@ -42,6 +42,7 @@ for (option.i in 1:length(env.list)) {
   
   dist.mean <- as.numeric(option.description[2])
   dist.sd <- as.numeric(option.description[3])
+  dist.ppos <- 1 - pnorm(0, mean = dist.mean, dist.sd)
   
 
 if(sampling.method == "structured") {
@@ -80,7 +81,9 @@ distribution[distribution < -99] <- -99
   
 while(abs(mean(distribution) - dist.mean) > mean.thresh | 
         abs(median(distribution) - dist.mean) > median.thresh | 
-        abs(sd(distribution)) - dist.sd > sd.thresh
+        abs(sd(distribution)) - dist.sd > sd.thresh |
+        abs(mean(distribution > 0) - dist.ppos) > ppos.thresh
+        
         ) {
   
   print(count)
@@ -151,13 +154,10 @@ for(i in 1:length(env.ls)) {
 
 
 
-}
-
-
 # Write results to tables
 
-write.table(experiment.stim.1, "/Users/Nathaniel/Dropbox/Git/PeeksAndKeeps/stimuli/Peeks and Keeps Stimuli 1.txt", sep = "\t")
-write.table(experiment.stim.2, "/Users/Nathaniel/Dropbox/Git/PeeksAndKeeps/stimuli/Peeks and Keeps Stimuli 2.txt", sep = "\t")
+write.table(env.formatted, "/Users/Nathaniel/Dropbox/Git/PeeksAndKeeps/stimuli/Peeks and Keeps Experiment 2 Practice Stimuli jan 2016.txt", sep = "\t")
+write.table(experiment.stim.2, "/Users/Nathaniel/Dropbox/Git/PeeksAndKeeps/stimuli/Peeks and Keeps Experiment 2 Stimuli 2 jan 2016.txt", sep = "\t")
 
 
 # Plot final results

@@ -1,0 +1,16 @@
+
+# JAGS model specification begins ...
+model {
+
+    Heads.A ~ dbin(p.A, Flips.A)
+    Heads.B ~ dbin(p.B, Flips.B)
+
+
+    # Prior distribution:
+    p.A ~ dbeta(1, 1)
+    p.B ~ dbeta(1, 1)
+
+p.delta <- p.B - p.A
+
+}
+

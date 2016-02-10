@@ -1,7 +1,3 @@
-  
-% ------------------------
-% DB and Confidence Science Manuscript
-% ------------------------
 
 %\documentclass{nature,floatsintext}
 
@@ -13,7 +9,6 @@
 \usepackage{graphicx}
 \usepackage{rotating}
 \usepackage{pdfpages}
-%\usepackage{Sweave}
 \usepackage{subcaption}
 \usepackage{float}
 
@@ -34,6 +29,179 @@ library("xtable")
 library("dplyr")
 library("snowfall")
 library("RColorBrewer")
+library("yarrr")
+library("beanplot")
+library("MCMCglmm")
+library("RColorBrewer")
+library("BEST")
+library("xtable")
+library("stringr")
+library("R2jags")
+library("BayesFactor")
+options(stringsAsFactors = F)
+@
+
+
+
+% Custom R Functions
+<<echo = F, message = F>>=
+
+hdi.text.fun <- function(x, 
+                         numSavedSteps = 5000, 
+                         burnInSteps = 100, 
+                         incl.mean = T, 
+                         digits = 2,
+                         calculate = T, wordy = F
+                         ) {
+  
+if(calculate == T) {
+  
+mcmc <- BESTmcmc(x, numSavedSteps = numSavedSteps, thinSteps = 1, burnInSteps = burnInSteps, verbose = F)
+hdi.t <- hdi(mcmc$mu)
+}
+
+if(calculate == F) {hdi.t <- hdi(x)}
+
+if(incl.mean == F) {
+
+hdi.text <- paste("[", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")
+
+}
+
+if(incl.mean == T) {
+
+  if(wordy == T) {
+  
+  if(calculate == T) {hdi.text <- paste(round(mean(mcmc$mu), digits), ", 95\\% HDI [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
+  
+  if(calculate == F) {hdi.text <- paste(round(mean(x), digits), ", 95\\% HDI [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
+  
+  }
+  
+    if(wordy == F) {
+    if(calculate == T) {hdi.text <- paste(round(mean(mcmc$mu), digits), ", [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
+  
+  if(calculate == F) {hdi.text <- paste(round(mean(x), digits), ", [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
+
+}
+}
+
+return(hdi.text)
+}
+
+
+betabinom.hdi <- function(vec, 
+                          alpha.prior = 1, 
+                          beta.prior = 1, 
+                          quant = .95, 
+                          na.rm = T) {
+  
+  vec <- as.vector(vec)
+  
+  if(na.rm) {
+    
+    vec <- vec[is.finite(vec)]
+    
+  }
+    
+  
+  n <- length(vec)
+  successes <- sum(vec == 1)
+  failures <- sum(vec == 0)
+  
+  alpha <- successes + alpha.prior
+  beta <- failures + beta.prior
+  
+  lb <- qbeta((1 - quant) / 2, shape1 = alpha, shape2 = beta)
+  ub <- qbeta(1 - ((1 - quant) / 2), shape1 = alpha, shape2 = beta)
+  mode <- alpha / (beta + alpha)
+  
+  hdi.text <- paste(round(mode, 2), " (95\\% HDI = [", round(lb, 2), ", ", round(ub, 2), "])", sep = "")
+  
+  
+  
+  return(list("lb" = lb, "ub" = ub, "mode" = mode, "text" = hdi.text))
+  
+}
+  
+add.binom.p.bar <- function(vec, 
+                            alpha.prior = 1, 
+                            beta.prior = 1, 
+                            quant = .95, 
+                            bar.col, 
+                            location = 1, 
+                            bar.width = .5, 
+                            add.text = T,
+                            bar.label = ""
+                            ) {
+  
+  
+  lb <- betabinom.hdi(vec)$lb
+  ub <- betabinom.hdi(vec)$ub
+  
+  rect(location - bar.width / 2, 0, location + bar.width / 2, mean(vec), col = bar.col)
+  segments(location, lb, location, ub, lwd = 2)
+  
+  if(add.text) {
+    
+    text(location + bar.width / 2, mean(vec), labels = round(mean(vec), 2), pos = 4)
+  }
+  
+  mtext(bar.label, side = 1, at = location)
+  
+    
+  }
+
+
+transparent <- function(orig.col = "red", trans.val = 1, maxColorValue = 255) {
+    
+    if(length(orig.col) == 1) {orig.col <- col2rgb(orig.col)}
+    if(!(length(orig.col) %in% c(1, 3))) {return(paste("length of original color must be 1 or 3!"))}
+    
+    final.col <- rgb(orig.col[1], orig.col[2], orig.col[3], alpha = (1 - trans.val) * 255, maxColorValue = maxColorValue)
+    
+    return(final.col)
+}
+
+compare.Coins <- function(Heads.A, Flips.A, Heads.B, Flips.B, n.iter = 10000, n.burnin = 1000, n.thin = 1) {
+  
+  modelString = "
+# JAGS model specification begins ...
+model {
+
+    Heads.A ~ dbin(p.A, Flips.A)
+    Heads.B ~ dbin(p.B, Flips.B)
+
+
+    # Prior distribution:
+    p.A ~ dbeta(1, 1)
+    p.B ~ dbeta(1, 1)
+
+p.delta <- p.B - p.A
+
+}
+"
+
+ 
+  
+  writeLines(modelString, con = "model.txt")
+    
+    parameters <- c("p.A", "p.B", "p.delta")
+    
+    JAGS.Output <- jags(data = list("Heads.A", "Flips.A", "Heads.B", "Flips.B"),   
+                        parameters.to.save = parameters,
+                        model.file ="model.txt",
+                        n.chains = 1, n.iter = n.iter, n.burnin = n.burnin, n.thin = n.thin)
+    
+ 
+  MCMC.All <- as.mcmc(JAGS.Output$BUGSoutput$sims.matrix) # unordered, pooled across chains
+  Summary <- summary(MCMC.All)
+  
+ return(list("Summary" = Summary, "MCMC" = MCMC.All))
+ 
+}
+  
+  
 @
 
 
@@ -41,6 +209,21 @@ library("RColorBrewer")
 
 \section*{Introduction}
 
+One day in the 1980s, a man named Martin Frankel walked into a stock broker's office in Toledo Ohio and said he wanted to invest in the stock market. Frankel explained to the owner of the office that after studying the market for years, he had develoepd a unique insight into the market -- to the point where he was cetain he could beat it. The owner was so impressed by Frankel's vision that he actually hired Frankel as a trader. Over the next 6 months, Frankel all-but lived at the broker's office -- meticulously studying the market and developing increasingly ingenious trade ideas. However, after 6 months, the owner became increasingly frustrated with Frankel. Despite all of his `brilliant' theories and plans, Frankel never actually \textit{acted} on any of his theories by making a trade. By his own admission, Frankel suffered from what he called `trader's block' wherein he had a hard time `pulling the trigger.' Because of his lack of action, Frankel was fired from the small broker's office \footnote{Frankel's story would have been forgotten if not for the fact that he  went on to earn over $200 Million dollars in a series of investment scams and Ponzi schemes. He is currently serving a XX year prison sentence.}.
+
+Why did Frankel fail as a legitimate broker? On the one hand, patience is a virtue -- one that Frankel had in spades. If Frankel had acted more impulsively and invested all of the firm's money in one `hot' stock on his first day, he would may been fired for putting the entire firm at risk on too little knowledge. Instead, Frankel's failure as a legitimate stock broker exemplifies the cost of waiting too long to act.
+
+This example exemplifies a common trade-off between acquiring information without risk, and acting on existing information with risk. This trade-off occurs in many areas of life. 
+
+\begin{itemize}
+
+\item Mate Selection: A person must decide how long to get to know someone via dating before committing to a long-term relationship. Too little dating could lead to marring a poor match, while waiting too long could lead to no marriage at all.
+
+\item Food Foraging: 
+
+\item Athletic training: How long should I train in boxing before I schedule my first real match?
+
+\end{itemize}
 
 
 \subsection{Exploration-exploitation trade-off}
@@ -52,6 +235,17 @@ This conflict between obtaining new information and acting on existing informati
 One of the most widely used experimental tasks used to study the exploration-exploitation conflict is the n-armed bandit. In an n-armed bandit, participants have a fixed number of trials to select an option and experience a consequential reward.
 
 
+\subsection{Mode Switching}
+
+Other research that has studied elective mode switching
+
+\begin{itemize}
+
+  \item \cite{halberstadt1995transitions}: Passive observation versus active experimentation in rule learning. Participants can freely choose between observation and experimental manipulation. ``With such a paradigm it will be possible to observe whether either mode of inquiry is preferred over the other at some or all stages of the inquiry process'' (p. 284). Result 1: People tend to passively observe prior to actively experiment. Result 2: Modes come in `clumps' - people tend to stick to one mode. Result 3: The environment affects how people generate hypotheses.
+  
+  
+
+\end{itemize}
 
 
 \subsection{Purely epistemic versus pragmatic actions}
@@ -73,7 +267,6 @@ One of the most widely used experimental tasks used to study the exploration-exp
 \end{itemize}
 
 \subsection{Combining three paradigms}
-
 
 \begin{center}
     \begin{tabular}{ | l | l | l | l | l |}
@@ -104,7 +297,6 @@ In order to study how people alternate between explicit exploration and exploita
 \section{Peeks and Keeps}
 
 Peeks and Keeps is an extension of an N-armed bandit task that explicitly separates exploration and exploitation decisions. In the task, participants repeatedly select one of N options with \textit{a priori} unknown underlying probability distributions over the course of M trials. On each trial, the participant selects an option and elects to either \textit{observe} the next outcome without financial feedback, or \textit{bet} on the outcome and receive the financial feedback. At the end of M trials, the participant is paid the sum of all sample outcomes revealed on bet trials. If he always observes and never bets, he receives no bonus. If he bets on every trial, he receives the sum total of all samples.
-
 
 
 \section{``Optimal'' Search in Peeks and Keeps}
@@ -138,62 +330,19 @@ We varied three parameters in our simulation, one at the agent level, and two at
 
 We had 5,000 agents play the game for each parameter combination. In Figure~\ref{fig:optimal}, we plot the environments and the median number of points earned by 5,000 agents using 0 to 100 peeks:
 
-
-<<eval = F, echo = F>>=
-# Load and aggregate optimal simulation data
-
-{
-
-files.to.use  <- list.files("simulations/oct 1 2015")
-files.to.use <- files.to.use[grepl("sim_result", files.to.use)]
-
-
-for(i in 1:length(files.to.use)) {
-  
-  current.df <- read.table(paste("simulations/oct 1 2015/", files.to.use[i], sep = ""), 
-                           stringsAsFactors = F, 
-                           header = T, 
-                           sep = "\t")
-  
-  if(i == 1) {peeks.sim <- current.df}
-  if(i > 1) {peeks.sim <- rbind(peeks.sim, current.df)}
-  
-}
-
-## Aggregate data
-points.agg <- peeks.sim %>%
-  group_by(n.bad, sd, n.peeks) %>%
-  summarise(
-    total.points.mean = mean(total.points, na.rm = T),
-    final.impression.mad.mean = mean(final.impression.mad, na.rm = T),
-    final.peek.impression.mad = mean(final.peek.impression.mad, na.rm = T),
-    final.peek.prefer.best.mean = mean(final.peek.prefer.best, na.rm = T),
-    first.keep.points.mean = mean(first.keep.points, na.rm = T),
-    n = n()
-    )
-
-
-write.table(points.agg, "simulations/oct 1 2015/oct 1 2015 agg.txt", sep = "\t")
-
-
-}
-
-@
-
-
 % Plot optimal peeks simulation
 <<echo = F, eval = T, fig.width = 8, fig.height = 4, message = F, results = 'hide'>>=
 {
    
-
-col.vec <- brewer.pal(10, "Set3")
+col.vec <- piratepal("google")
   
 points.agg <- read.table("simulations/oct 1 2015/oct 1 2015 agg.txt")
 
 # Plotting
 
 pdf("figures/optimal_result_points.pdf", width = 11, height = 5)
-{
+
+
 n.bad.vec <- sort(unique(points.agg$n.bad))
 sd.vec <- sort(unique(points.agg$sd))
 
@@ -261,9 +410,11 @@ par(mar = c(3, 5, 5, 1))
 }
 
 dev.off()
-}
 
 }
+
+
+
 
 @
 
@@ -320,1426 +471,1461 @@ print(optimal.ss.table.x, include.rownames = F,
       floating.environment = getOption("xtable.floating.environment", "table*"))
 @
 
-The optimal number of peeks and their associated expected point earnings for each environment is presented in Table~\ref{table:optimalsim1}. Here, we see that as both the number of bad options and standard deviation of option outcomes increases, the optimal number of peeks increases. In the easiest environment, with 1 negative option and an option standard deviation of 5, the optimal number of peeks is \Sexpr{subset(optimal.ss.table, n.bad == 1 & sd == 5)$npeeks} leading to an expected earning of \Sexpr{subset(optimal.ss.table, n.bad == 1 & sd == 5)$max.points} points. This suggests that this environment is so easy to learn that peeking is unecessary, and even detrimental. In contrast, in the most difficult environment, with 3 negative outcomes and an option standard deviation of 30, the optimal number of peeks is \Sexpr{subset(optimal.ss.table, n.bad == 3 & sd == 30)$npeeks} leading to an expected earning of \Sexpr{subset(optimal.ss.table, n.bad == 3 & sd == 30)$max.points} points.
-
-\subsection{Required learning in each environment}
-
-How much learning is necessary in each environment? To answer this, we calculated how well agents using the optimal number of peeks learned their environments. We defined learning with two measures: mean absolute impression deviation (MAID), the mean absolute difference between agent's impressions of options and the option's true EV, and prefer best (PB), the probability that, at the end of its peeking trials, the agent preferred the best option. 
+The optimal number of peeks and their associated expected point earnings for each environment is presented in Table~\ref{table:optimalsim1}. Here, we see that as both the number of bad options and standard deviation of option outcomes increases, the optimal number of peeks increases. In the easiest environment, with 1 negative option and an option standard deviation of 5, the optimal number of peeks is \Sexpr{subset(optimal.ss.table, n.bad == 1 & sd == 5)$npeeks} leading to an expected earning of \Sexpr{subset(optimal.ss.table, n.bad == 1 & sd == 5)$max.points} points. This suggests that this environment is so easy to learn that peeking is unnecessary, and even detrimental. In contrast, in the most difficult environment, with 3 negative outcomes and an option standard deviation of 30, the optimal number of peeks is \Sexpr{subset(optimal.ss.table, n.bad == 3 & sd == 30)$npeeks} leading to an expected earning of \Sexpr{subset(optimal.ss.table, n.bad == 3 & sd == 30)$max.points} points.
 
 
+%' \subsection{Required learning in each environment}
+%' 
+%' How much learning is necessary in each environment? To answer this, we calculated how well agents using the optimal number of peeks learned their environments. We defined learning with two measures: mean absolute impression deviation (MAID), the mean absolute difference between agent's impressions of options and the option's true EV, and prefer best (PB), the probability that, at the end of its peeking trials, the agent preferred the best option. 
+%' 
+%' <<eval = F, echo = F>>=
+%' 
+%' # Load and aggregated simulations
+%'   
+%' date.to.use <- "oct 3 2015"
+%' 
+%' 
+%' {
+%'   
+%' files.to.use  <- list.files(paste("simulations/", date.to.use, " learning", sep = ""))
+%' files.to.use <- files.to.use[grepl("result", files.to.use)]
+%' 
+%' 
+%' for(i in 1:length(files.to.use)) {
+%'   
+%'   current.df <- read.table(paste("simulations/", date.to.use, " learning/", files.to.use[i], sep = ""), 
+%'                            stringsAsFactors = F, 
+%'                            header = T, 
+%'                            sep = "\t")
+%'   
+%'   if(i == 1) {peeks.sim <- current.df}
+%'   if(i > 1) {peeks.sim <- rbind(peeks.sim, current.df)}
+%'   
+%' }
+%' 
+%' ## Aggegate data
+%' learning.agg <- peeks.sim %>%
+%'   group_by(n.bad, sd, n.peeks) %>%
+%'   summarise(
+%'     final.impression.mad.mean = mean(final.impression.mad),
+%'     final.peek.prefer.best.mean = mean(final.peek.prefer.best, na.rm = T),
+%'     n = n()
+%'     )
+%' 
+%' 
+%' write.table(learning.agg, paste("simulations/", date.to.use, " learning/", date.to.use, " agg.txt", sep = ""), sep = "\t")
+%' }
+%' 
+%' 
+%' @
+%' 
+%' <<echo = F, message = F, prompt = F>>=
+%' 
+%' date.to.use <- "oct 3 2015"
+%' 
+%' learning.agg <- read.table(paste("simulations/", date.to.use, " learning/", date.to.use, " learning agg.txt", sep = ""), sep = "\t")
+%' 
+%' 
+%' pdf("figures/optimal_result_learning.pdf", width = 11, height = 5)
+%' {
+%' n.bad.vec <- sort(unique(learning.agg$n.bad))
+%' sd.vec <- sort(unique(learning.agg$sd))
+%' 
+%' par(mfrow = c(1, 4))
+%' par(mar = c(3, 5, 5, 1))
+%' 
+%'   for(sd.i in 1:length(sd.vec)) {
+%'     
+%'     plot(1, 
+%'          xlim = c(-5, 100), 
+%'          ylim = c(0, 1), 
+%'          type = "n",
+%'          ylab = "p(prefer good option)",
+%'          xlab = "Number of peeking trials",
+%'          main = paste("sd = ", sd.vec[sd.i], sep = ""),
+%'          cex.main = 1
+%'          )
+%'     
+%'     mtext("Pos ~ N(5, sd), Neg ~ N(-5, sd)", side = 3, line = .2, cex = .5)
+%'     
+%'     rect(-10000, -1000, 10000, 10000, col = gray(.95))
+%'     
+%'     abline(h = seq(0, 1, .1), col = gray(1), lwd = 1.5)
+%'     abline(h = seq(.05, 1.05, .1), col = gray(1), lwd = .75)
+%'     
+%'     abline(v = seq(0, 100, 10), col = gray(1), lwd = 1.5)
+%'     abline(v = seq(50, 150, 10), col = gray(1), lwd = .75)
+%'     
+%'     abline(h = 0)
+%'     
+%'     legend("bottomright",
+%'            paste("N neg = ", n.bad.vec, sep = ""),
+%'            pch = 16,
+%'            col = col.vec,
+%'            lty = 1
+%'            )
+%'     
+%'     
+%'   for(n.bad.i in 1:length(n.bad.vec)) {
+%'     
+%'     data <- subset(learning.agg, n.bad == n.bad.vec[n.bad.i] & sd == sd.vec[sd.i])
+%'     
+%'     
+%'     lines(data$n.peeks, 
+%'           data$final.peek.prefer.best.mean, 
+%'           col = col.vec[n.bad.i], type = "b", pch = 16)
+%'     
+%' #     optimal.peeks <- min(data$n.peeks[data$total.points.mean == max(data$total.points.mean)])
+%' #     optimal.points <- max(data$total.points.mean)
+%' #     
+%' #     points(optimal.peeks, optimal.points, pch = 21, cex = 1.5)
+%' #     text(optimal.peeks, 
+%' #          optimal.points, 
+%' #          labels = paste(optimal.peeks, ", ", round(optimal.points, 0), sep = ""), 
+%' #          pos = 3)
+%'     
+%'  
+%' 
+%' }
+%' 
+%' }
+%' 
+%' dev.off()
+%' }
+%' 
+%' 
+%' @
+%' 
+%' 
+%' \begin{figure}
+%' \centering
+%' \includegraphics[width=6in]{figures/optimal_result_learning.pdf}
+%' \caption{\label{fig:learning}Aggregate results from agent-based sampling simulation. learning results.}
+%' \end{figure}
+%' 
 
-<<eval = F, echo = F>>=
-
-# Load and aggregated simulations
-  
-date.to.use <- "oct 3 2015"
 
 
-{
-  
-files.to.use  <- list.files(paste("simulations/", date.to.use, " learning", sep = ""))
-files.to.use <- files.to.use[grepl("result", files.to.use)]
+
+% Load Data
 
 
-for(i in 1:length(files.to.use)) {
-  
-  current.df <- read.table(paste("simulations/", date.to.use, " learning/", files.to.use[i], sep = ""), 
-                           stringsAsFactors = F, 
-                           header = T, 
-                           sep = "\t")
-  
-  if(i == 1) {peeks.sim <- current.df}
-  if(i > 1) {peeks.sim <- rbind(peeks.sim, current.df)}
-  
-}
+<<echo = F, message = F, warning = F>>=
+participants <- read.table("data/participants.txt", sep = "\t", header = T)
+actions <- read.table("data/actions.txt", sep = "\t", header = T)
+condition.table <- read.table("data/conditiontable.txt", sep = "\t", header = T)
+distributions <- read.table("data/oct2015/peekkeep_oct2015_gamedist.txt", 
+                            sep = "\t", 
+                            header = T)
 
-## Aggegate data
-learning.agg <- peeks.sim %>%
-  group_by(n.bad, sd, n.peeks) %>%
-  summarise(
-    final.impression.mad.mean = mean(final.impression.mad),
-    final.peek.prefer.best.mean = mean(final.peek.prefer.best, na.rm = T),
-    n = n()
-    )
-
-
-write.table(learning.agg, paste("simulations/", date.to.use, " learning/", date.to.use, " agg.txt", sep = ""), sep = "\t")
-}
-
+  optionorder <- read.table("data/oct2015/peekkeep_oct2015_optionorder.txt", 
+                            sep = "\t", 
+                            header = T)
 
 @
 
+
+
+
+% Plotting and analysis functions
 
 <<echo = F>>=
-
-date.to.use <- "oct 3 2015"
-
-learning.agg <- read.table(paste("simulations/", date.to.use, " learning/", date.to.use, " learning agg.txt", sep = ""), sep = "\t")
-
-
-pdf("figures/optimal_result_learning.pdf", width = 11, height = 5)
-{
-n.bad.vec <- sort(unique(learning.agg$n.bad))
-sd.vec <- sort(unique(learning.agg$sd))
-
-par(mfrow = c(1, 4))
-par(mar = c(3, 5, 5, 1))
-
-  for(sd.i in 1:length(sd.vec)) {
-    
-    plot(1, 
-         xlim = c(-5, 100), 
-         ylim = c(0, 1), 
-         type = "n",
-         ylab = "p(prefer good option)",
-         xlab = "Number of peeking trials",
-         main = paste("sd = ", sd.vec[sd.i], sep = ""),
-         cex.main = 1
-         )
-    
-    mtext("Pos ~ N(5, sd), Neg ~ N(-5, sd)", side = 3, line = .2, cex = .5)
-    
-    rect(-10000, -1000, 10000, 10000, col = gray(.95))
-    
-    abline(h = seq(0, 1, .1), col = gray(1), lwd = 1.5)
-    abline(h = seq(.05, 1.05, .1), col = gray(1), lwd = .75)
-    
-    abline(v = seq(0, 100, 10), col = gray(1), lwd = 1.5)
-    abline(v = seq(50, 150, 10), col = gray(1), lwd = .75)
-    
-    abline(h = 0)
-    
-    legend("bottomright",
-           paste("N neg = ", n.bad.vec, sep = ""),
-           pch = 16,
-           col = col.vec,
-           lty = 1
-           )
-    
-    
-  for(n.bad.i in 1:length(n.bad.vec)) {
-    
-    data <- subset(learning.agg, n.bad == n.bad.vec[n.bad.i] & sd == sd.vec[sd.i])
-    
-    
-    lines(data$n.peeks, 
-          data$final.peek.prefer.best.mean, 
-          col = col.vec[n.bad.i], type = "b", pch = 16)
-    
-#     optimal.peeks <- min(data$n.peeks[data$total.points.mean == max(data$total.points.mean)])
-#     optimal.points <- max(data$total.points.mean)
-#     
-#     points(optimal.peeks, optimal.points, pch = 21, cex = 1.5)
-#     text(optimal.peeks, 
-#          optimal.points, 
-#          labels = paste(optimal.peeks, ", ", round(optimal.points, 0), sep = ""), 
-#          pos = 3)
-    
- 
-
-}
-
-}
-
-dev.off()
-}
-
-
-@
-
-
-
-
-
-\begin{figure}
-\centering
-\includegraphics[width=6in]{figures/optimal_result_learning.pdf}
-\caption{\label{fig:learning}Aggregate results from agent-based sampling simulation. learning results.}
-\end{figure}
-
-
-
-
-% Custom Functions
-<<echo = F, message = F>>=
-
-hdi.text.fun <- function(x, 
-                         numSavedSteps = 5000, 
-                         burnInSteps = 100, 
-                         incl.mean = T, 
-                         digits = 2,
-                         calculate = T, wordy = F
-                         ) {
+plot.pak <- function(n.options,
+                             worker.name = "",
+                             game.type = "",
+                             option.sd = "",
+                             selection.ls,
+                             outcome.ls,
+                             action.ls,
+                             best.option.vec,
+                             col.vec = piratepal("google", length.out = 6)
+                             ) {
   
-if(calculate == T) {
+  games.to.plot <- length(selection.ls)
   
-mcmc <- BESTmcmc(x, numSavedSteps = numSavedSteps, thinSteps = 1, burnInSteps = burnInSteps, verbose = F)
-hdi.t <- hdi(mcmc$mu)
+if(length(col.vec) < 6) {col.vec <- rep(col.vec, length.out = 6)}
+  
+if(games.to.plot == 2) {
+
+layout(matrix(c(1, 1, 2, 3), nrow = 2, ncol = 2, byrow = T), 
+       widths = c(4, 4), heights = c(.85, 4))
+  
 }
 
-if(calculate == F) {hdi.t <- hdi(x)}
+if(games.to.plot == 1) {
 
-if(incl.mean == F) {
-
-hdi.text <- paste("[", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")
-
-}
-
-if(incl.mean == T) {
-
-  if(wordy == T) {
-  
-  if(calculate == T) {hdi.text <- paste(round(mean(mcmc$mu), digits), ", 95\\% HDI [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
-  
-  if(calculate == F) {hdi.text <- paste(round(mean(x), digits), ", 95\\% HDI [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
-  
-  }
-  
-    if(wordy == F) {
-    if(calculate == T) {hdi.text <- paste(round(mean(mcmc$mu), digits), ", [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
-  
-  if(calculate == F) {hdi.text <- paste(round(mean(x), digits), ", [", round(hdi.t[1], digits), ", ", round(hdi.t[2], digits), "]", sep = "")}
-
-}
-}
-
-return(hdi.text)
-}
-
-@
-
-% Load Datafiles
-<<eval = TRUE, echo = F, message=FALSE>>=
-
-# -----------------
-# Load packages and datafiles
-# -----------------
-
-library(dplyr)  
-library(beanplot)
-library(MCMCglmm)
-library(RColorBrewer)
-library(BEST)
-library(xtable)
-
-
-
-
-{
-# Critical Datafiles:
-
-# pak_trialdata_batch2.txt: trial level information from experiment server
-# gamelookup.txt: Information about each game
-# Peeks and Keeps Stimuli 1.txt: Experimental stimuli
-
-#turk1 <- read.table("pak_study1_pk.txt", sep = "\t", header = T)
-uni <- read.table("data/pak_unipark_data.txt", sep = "\t", header = T, stringsAsFactors = F)
-pk <- read.table("data/pak_trialdata_batch2.txt", sep = "\t", header = T, stringsAsFactors = F)
-game.lookup <- read.table("data/gamelookup.txt", sep = "\t", header = T, stringsAsFactor = F)
-points <- read.table("stimuli/Peeks and Keeps Stimuli 1.txt", sep = "\t", stringsAsFactors = F)
-}
-
-@
-
-% Create dataframes
-<<echo = F, warning = F>>=
-# -----------------
-# Create main dataframes
-# pk, pk.r -  raw trial level data. pk.r removes invalid data
-# pk.p - participant level aggregated data (based ok pk.r)
-# pk.t - trial level aggregated data
-# -----------------
-{
-# ---------
-# Clean and append unipark datafile
-# ---------
-{
-uni <- uni %>%
-  mutate(
-    workerid = gsub(" ", "", workerid),
-    barratt.fac1 = bimp_11 + bimp_32 + bimp_05 + 5 - bimp_09 + (5 - bimp_21),
-    barratt.fac2 = bimp_17 + bimp_23 + bimp_03 + bimp_02 + bimp_28 + bimp_04, # + bimp_20
-    barratt.fac3 = (5 - bimp_12) + (5 - bimp_01) + (5 - bimp_08) + (5 - bimp_07) + (5 - bimp_13) + bimp_14,
-    barratt.fac4 = (5 - bimp_15) + (5 - bimp_33) + (5 - bimp_10) + bimp_03 + bimp_18,
-    barratt.fac5 = bimp_22 + bimp_16 + (5 - bimp_34) + bimp_24,
-    barratt.fac6 = bimp_30 + bimp_06 + bimp_25,
-    barratt.fac1 = ifelse(barratt.fac1 < 5, NA, barratt.fac1),
-    barratt.fac2 = ifelse(barratt.fac2 < 6, NA, barratt.fac2),
-    barratt.fac3 = ifelse(barratt.fac3 < 6, NA, barratt.fac3),
-    barratt.fac4 = ifelse(barratt.fac4 < 5, NA, barratt.fac4),
-    barratt.fac5 = ifelse(barratt.fac5 < 4, NA, barratt.fac5),
-    barratt.fac6 = ifelse(barratt.fac6 < 3, NA, barratt.fac6),
-    barratt.all = barratt.fac1 + barratt.fac2 + barratt.fac3 + barratt.fac4 + barratt.fac5 + barratt.fac6,
-    attention.pass = grepl("read", readinstructions),
-    sex = ifelse(sex == 1, "male", ifelse(sex == 2, "female", NA)),
-    max.nen.all = max_nen_01m + max_nen_02 + max_nen_03 + max_nen_04m + max_nen_05 + max_nen_05,
-    reg.sch.all = reg_sch_01 + reg_sch_02 + reg_sch_03 + reg_sch_04 + (8 - reg_sch_05r),
-    reg.sch.all = ifelse(reg.sch.all < 0, NA, reg.sch.all),
-    max.nen.all = ifelse(max.nen.all < 0, NA, max.nen.all)
-    )
-
-for(i in 1:nrow(uni)) {
-  
-  uni$barratt.sd[i] <- sd(uni[i, grep("bimp", names(uni))])
-  uni$reg.sch.sd[i] <- sd(uni[i, grep("reg_sch", names(uni))])
-  uni$max.nen.sd[i] <- sd(uni[i, grep("max_nen", names(uni))])
+layout(matrix(c(1, 2), nrow = 2, ncol = 1, byrow = T), 
+       widths = c(4), heights = c(.85, 4))
   
 }
 
 
-uni <- uni %>% mutate(
-  barratt.all = ifelse(barratt.sd == 0, NA, barratt.all),
-  max.nen.all = ifelse(max.nen.sd == 0, NA, max.nen.all),
-  reg.sch.all = ifelse(reg.sch.sd == 0, NA, reg.sch.all),
-  demo.valid = ifelse(is.finite(barratt.all) & is.finite(reg.sch.all) & is.finite(max.nen.all) & 
-                        sex %in% c("male", "female") & age %in% 16:90, TRUE, FALSE)
-  )
-}
-
-
-
-# Get points table and create restructured points.2 table
-{
-points$option.order.display <- points$option.order
-option.lu <- data.frame("option.order.display" = c("bgm", "bmg", "mbg", "mgb", "gmb", "gbm"),
-                        "stim.order.start" = as.character(c(312, 321, 231, 213, 123, 132)), stringsAsFactors = F
-                        )
-points <- merge(points, option.lu)
-names(points)[c(2:3, 6:8)] <- c("condition.stability", "condition.difficulty", "A", "B", "C")
-
-# Restructure points table
-
-points.2 <- points
-
-points.A <- points[,c(1:6, 9)]
-points.B <- points[,c(1:5, 7, 9)]
-points.C <- points[,c(1:5, 8, 9)]
-
-names(points.A)[6] <- "outcome.comp"
-names(points.B)[6] <- "outcome.comp"
-names(points.C)[6] <- "outcome.comp"
-
-points.2 <- rbind(points.A, points.B, points.C)
-
-points.2$selection.display <- c(rep("A", 4800), rep("B", 4800), rep("C", 4800))
-points.2$trial.c <- points.2$trial
-}
-
-# Add and update pk
-{
-  pk <- merge(pk, game.lookup, by = "gameid")
-  
-names(pk)[which(names(pk) %in% c("condition.action", "stim.order"))] <- c("condition.mode", "stim.order.start")
-
-
-
-# Convert date to time
-date.2 <- paste(substr(pk$date, 1, 19), ".", substr(pk$date, 21, 23), sep = "")
-# pk$time <- strptime(date.2, "%Y-%m-%d %H:%M:%OS")
-pk$year <- as.numeric(substr(date.2, 1, 4))
-pk$month <- as.numeric(substr(date.2, 6, 7))
-pk$day <- as.numeric(substr(date.2, 9, 10))
-pk$hour <- as.numeric(substr(date.2, 12, 13))
-pk$minute <- as.numeric(substr(date.2, 15, 16))
-pk$second <- as.numeric(substr(date.2, 18, 23))
-pk$time.seconds <- with(pk, day * 24*60*60 + hour * 60*60 + minute * 60 + second)
-
-pk <- arrange(pk, workerid, trial, time.seconds)
-
-pk$rt[2:nrow(pk)] <- pk$time.seconds[2:nrow(pk)] - pk$time.seconds[1:(nrow(pk) - 1)]
-pk$rt[pk$trial == 1] <- NA
-pk$rt.l <- log(pk$rt)
-
-# Get option orders and convert original A, B, C values to 1, 2, 3
-#  where 1 is the best option, 2 is the second best, and 3 is the worst
-
-pk <- pk %>%
-  mutate(
-    condition.mode = ifelse(condition.mode == "peeks", "peek",
-                            ifelse(condition.mode == "keeps", "keep", NA)),
-    peek.bin = mode == "peek",
-    keep.bin = mode == "keep",
-    stim.order.start = as.character(stim.order.start),
-    a.option = as.numeric(substr(stim.order.start, 1, 1)),
-    b.option = as.numeric(substr(stim.order.start, 2, 2)),
-    c.option = as.numeric(substr(stim.order.start, 3, 3)),
-    a.option.true = as.numeric(a.option),
-    b.option.true = as.numeric(b.option),
-    c.option.true = as.numeric(c.option),
-    
-    # Convert values in trials 101 to 200 for dynamic condition
-    
-    a.option.true = ifelse(a.option == 3 & condition.stability == "dynamic" & trial > 100, 1,
-                    ifelse(a.option == 1 & condition.stability == "dynamic" & trial > 100, 3,
-                    ifelse(condition.stability == "stable" | trial <= 100 | a.option == 2, a.option.true, NA))),
-    
-    b.option.true = ifelse(b.option == 3 & condition.stability == "dynamic" & trial > 100, 1,
-                    ifelse(b.option == 1 & condition.stability == "dynamic" & trial > 100, 3,
-                    ifelse(condition.stability == "stable" | trial <= 100 | b.option == 2, b.option.true, NA))),
-    
-    c.option.true = ifelse(c.option == 3 & condition.stability == "dynamic" & trial > 100, 1,
-                    ifelse(c.option == 1 & condition.stability == "dynamic" & trial > 100, 3,
-                    ifelse(condition.stability == "stable" | trial <= 100 | c.option == 2, c.option.true, NA))),
-    
-    selection.num = ifelse(selection.display == "A", a.option.true,
-                    ifelse(selection.display == "B", b.option.true,
-                    ifelse(selection.display == "C", c.option.true, NA)))
-    )
-
-
-# Add distribution means to option.true
-
-distribution.lookup <- data.frame("option" = c(1, 2, 3),
-                                  "dist.mean" = c(5, 0, -5)
-)
-
-pk <- merge(pk, distribution.lookup, by.x = "selection.num", by.y = "option")
-pk <- pk[order(pk$gameid, pk$workerid, pk$time),]
-
-
-pk <- pk %>% 
-  mutate(
-    reward = ifelse(mode == "peek", 0, outcome),
-    select.best = dist.mean == 5,
-    select.worst = dist.mean == -5,
-     trial.cut10 = cut(trial, breaks = seq(0, 200, 10)),
-     trial.cut20 = cut(trial, breaks = seq(0, 200, 20)),
-     last.outcome = ifelse(trial != 1, lag(outcome, 1), NA),
-     last.selection.display = ifelse(trial != 1, lag(selection.display, 1), NA),
-     last.selection.num = ifelse(trial != 1, lag(selection.num, 1), NA),
-     last.mode = ifelse(trial != 1, lag(mode, 1), NA),
-     selection.switch = ifelse(trial != 1, selection.display != last.selection.display, NA),
-     mode.switch = ifelse(trial != 1, mode != last.mode, NA)
-    )
-
-pk <- mutate(pk, 
-                 mode.seq = ifelse(trial != 1, paste(substr(last.mode, 1, 1), substr(mode, 1, 1), sep = ""), NA))
-
-
-
-participant.lookup <- pk %>%
-  group_by(workerid) %>%
-  summarise(
-     n.games = length(unique(gameid)),
-     gameid = gameid[1],
-     total.entries = n(),
-     max.trial = max(trial),
-     n.repeated.trials = sum(duplicated(trial))
-    
-  )
-
-participant.lookup <- participant.lookup %>%
-  mutate(
-name.length = nchar(workerid),
-first.letter = substr(workerid, 1, 1),
-valid.turker = name.length %in% c(13, 14) & first.letter == "A"
-)
-
-
-# Add trial.c, a corrected version of trial
-pk <- arrange(pk, gameid, workerid, time.seconds)
-
-for (worker.i in unique(pk$workerid)) {
-  
-  trials.original <- pk$trial[pk$workerid == worker.i]
-  trials.new <- 1:length(trials.original)
-  
-  pk$trial.c[pk$workerid == worker.i] <- trials.new
-
-}
-
-pk <- pk %>%
-  mutate(
-    trial.c.cut10 = cut(trial.c, seq(0, 200, 10)),
-    trial.c.cut20 = cut(trial.c, seq(0, 200, 20))
-    )
-
-# Add participant data to main df
-
-pk <- merge(pk, participant.lookup[c("workerid", "total.entries", "n.repeated.trials", "valid.turker", "max.trial")])
-
-# Add expected point information to main df
-
-pk <- merge(pk, points.2[, c(2, 3, 9, 6, 7, 8)], 
-              by = c("condition.stability", "condition.difficulty", "trial.c", 
-                     "stim.order.start", "selection.display"), all.x = T)
-
-pk <- arrange(pk, gameid, workerid, time.seconds)
-
-pk$outcome.incorrect <- pk$outcome != pk$outcome.comp
-
-# Determine ''correct'' total for each row
-
-for(worker.i in unique(pk$workerid)) {
-  
-  totals <- cumsum(pk$reward[pk$workerid == worker.i])
-  pk$total.c[pk$workerid == worker.i] <- totals
-  
-}
-  
-
-}
-
-## pk.p - Aggregate data at level of participant
-{
-  
-pk.p <- pk %>%
-  group_by(workerid) %>%
-  summarise(
-    gameid = gameid[1],
-    condition.mode = condition.mode[1],
-    condition.difficulty = condition.difficulty[1],
-    condition.stability = condition.stability[1],
-    unipark.condition = unipark.condition[1],
-    rt.mean = mean(rt, na.rm = T),
-    rt.median = median(rt, na.rm = T),
-    rt.l.mean = mean(rt.l, na.rm = T),
-    rt.l.median = median(rt.l, na.rm = T),
-    total.trials = max(trial),
-    selectionswitch.mean = mean(selection.switch, na.rm = T),
-    n.option.switch = sum(selection.switch, na.rm = T),
-    modeswitch.mean = mean(mode.switch, na.rm = T),
-    selected.all = ifelse(all(c("A", "B", "C") %in% selection.display), T, F),
-    n.peeks = sum(peek.bin),
-    p.peeks = mean(peek.bin),
-    n.keeps = sum(keep.bin),
-    n.peeksandkeeps = sum(peek.bin) + sum(keep.bin),
-    total.points = sum(reward),
-    correct.total.p = mean(total.c == total),
-    correct.outcome.p = mean(outcome.comp == outcome),
-    n.select.best = sum(select.best),
-    total.points.pos = sum(reward) > 0
-  )
-
-pk.p <- pk.p %>%
-  mutate(
-    name.length = nchar(workerid),
-    first.letter = substr(workerid, 1, 1),
-    valid.turker = name.length %in% c(13, 14) & first.letter == "A")
-
-
-# Add uni data to pk.p
-
-pk.p <- merge(pk.p, uni, all.x = T)
-
-pk.p.fh <- pk %>%
-  filter(trial >= 0 & trial <= 100) %>%
-  group_by(workerid) %>%
-  summarise(
-    selectionswitch.fh.mean = mean(selection.switch, na.rm = T),
-    modeswitch.fh.mean = mean(mode.switch, na.rm = T),
-    n.peeks.fh = sum(peek.bin),
-    total.points.fh = sum(reward)
-  )
-
-pk.p.sh <- pk %>%
-  filter(trial >= 101 & trial <= 200) %>%
-  group_by(workerid) %>%
-  summarise(
-    selectionswitch.sh.mean = mean(selection.switch, na.rm = T),
-    modeswitch.sh.mean = mean(mode.switch, na.rm = T),
-    n.peeks.sh = sum(peek.bin),
-    total.points.sh = sum(reward)
-  )
-
-pk.p <- merge(pk.p, pk.p.fh, by = "workerid")
-pk.p <- merge(pk.p, pk.p.sh, by = "workerid")
-
-pk <- merge(pk, pk.p[c("workerid", "correct.total.p", "total.trials")])
-
-
-
-
-
-# Calculate turk reward for each participant
-
-pk.p <- pk.p %>%
-  mutate(
-    turk.reward = ifelse(total.points < 0, 0, 
-                  ifelse(total.trials > 200, 0, 
-                  round(total.points / 1000, 2)))
-    )
-
-# pk.sb (participant sampling behavior
-
-pk.sb <- pk %>%
-  filter(selection.switch == F & condition.mode == "peek") %>%
-  group_by(workerid) %>%
-  summarise(
-    modeswitch.inoption.mean = mean(mode.switch),
-    modeswitch.inoption.n = n()
-  )
-
-
-pk.p <- merge(pk.p, pk.sb, all.x = T)
-
-# Get response times for peeks vs. keeps for peek condition
-
-part.peek.rt <- pk %>%
-  filter(condition.mode == "peek" & mode == "peek" & rt > 0 & rt < 20) %>%
-  group_by(workerid) %>%
-  summarize(
-    peek.rt.l.mean = mean(rt.l, na.rm = T),
-    peek.rt.l.median = median(rt.l, na.rm = T)
-    )
-
-part.keep.rt <- pk %>%
-  filter(condition.mode == "peek" & mode == "keep" & rt > 0 & rt < 20) %>%
-  group_by(workerid) %>%
-  summarize(
-    keep.rt.l.mean = mean(rt.l, na.rm = T),
-    keep.rt.l.median = median(rt.l, na.rm = T)
-  )
-  
-pk.p <- merge(pk.p, part.peek.rt, all.x = T)
-pk.p <- merge(pk.p, part.keep.rt, all.x = T)
-
-
-
-pk.p.r <- filter(pk.p, total.trials %in% c(199, 200) &
-                 correct.total.p >= .95 & 
-                 valid.turker == TRUE &
-                 trustdata == 1
-                 )
-
-}
-
-# pk.r - Delete cases where trials is greater than 200. In these cases, the player played more than once!
-{
-
-
-pk.r <- subset(pk, valid.turker == T & 
-                 total.entries %in% c(199, 200) & 
-                 is.finite(outcome) & 
-                 max.trial <= 200 & 
-                 trial.c <= 200)
-
-pk.r <- arrange(pk.r, workerid, trial.c)
-}
-
-## pk.t - Aggregate data at level of trial
-{
-pk.t <- pk.r %>%
-  group_by(trial.c, condition.mode, condition.difficulty, condition.stability) %>%
-  summarise(
-    total.mean = mean(total, na.rm = T),
-    total.median = median(total, na.rm = T),
-    total.c.mean = mean(total.c, na.rm = T),
-    total.c.median = median(total.c, na.rm = T),
-    peek.mean = mean(peek.bin, na.rm = T),
-    outcome.mean = mean(outcome, na.rm = T),
-    outcome.median = median(outcome, na.rm = T),
-    optionswitch.mean = mean(selection.switch, na.rm = T),
-    modeswitch.mean = mean(mode.switch, na.rm = T)
-  )
-
-
-#write.table(pk.t, "/Users/Nathaniel/Dropbox/Teaching/Current Teaching/Empra Summary 2015 Peeks and Keeps/SS15_Empra2/datasets/trialdata.txt", sep = "\t")
-
-}
-
-# Write simplified dataset for empra course
-{
-#empra <- select(pk.p.r, workerid, condition.mode, condition.difficulty, condition.stability,
-#                n.peeks, p.peeks, total.points, duration, sex, age, barratt.all, max.nen.all, 
-#                reg.sch.all, total.points.fh, total.points.sh)
-
-#write.table(empra, "empra.txt", sep = "\t")
-}
-
-}
-@
-
-
-<<eval = F, echo = F>>=
-# ------------------
-# Plotting
-# ------------------
-{
-  
-col.vec <- brewer.pal(12, name = "Set3")[c(5:8, 5:8)]
-
-# Point totals by Trial
-{
-
-dat <- aggregate(total ~ trial.c + condition.mode + condition.difficulty + condition.stability,
-                 data = pk.r, 
-                 FUN = mean)
-
-
-layout(matrix(c(rep(1:2, each = 2, times = 2), c(3, 4, 7, 8, 5, 6, 9, 10)), byrow = T, nrow = 4, ncol = 4),
-      widths = rep(2, 4),
-      heights = c(2, 2, 3, 3))
-
-# Peeks Plot
-
-plot(1, xlim = c(1, 200), ylim = c(-150, 400), main = "Peeks and Keeps", xlab = "Trial"
-, ylab = "Total Points", type = "n")
-
-
-abline(h = seq(-100, 400, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 2)
-abline(h = seq(-50, 450, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 1)
-abline(v = 100, lty = 2, col = gray(.5, alpha = .5), lwd = 1)
-abline(h = 0, lty = 1, lwd = 1)
-
-
-pse <- subset(dat, subset = condition.mode == "peek" & condition.stability == "stable" &
-              condition.difficulty == "easy")
-
-psh <- subset(dat, subset = condition.mode == "peek" & condition.stability == "stable" &
-                condition.difficulty == "hard")
-
-pde <- subset(dat, subset = condition.mode == "peek" & condition.stability == "dynamic" &
-                condition.difficulty == "easy")
-
-pdh <- subset(dat, subset = condition.mode == "peek" & condition.stability == "dynamic" &
-                condition.difficulty == "hard")
-
-lines(pse$trial.c, pse$total, col = col.vec[1], lwd = 2)
-lines(psh$trial.c, psh$total, col = col.vec[2], lwd = 2)
-lines(pde$trial.c, pde$total, col = col.vec[1], lty = 2, lwd = 2)
-lines(pdh$trial.c, pdh$total, col = col.vec[2], lty = 2, lwd = 2)
-
-
-# Keeps plot
-
-plot(1, xlim = c(1, 200), ylim = c(-150, 450), main = "Keeps Only", xlab = "Trial"
-     , ylab = "Total Points", type = "n")
-
-abline(h = seq(-100, 400, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 2)
-abline(h = seq(-50, 450, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 1)
-abline(v = 100, lty = 2, col = gray(.5, alpha = .5), lwd = 1)
-abline(h = 0, lty = 1, lwd = 1)
-
-kse <- subset(dat, subset = condition.mode == "keep" & condition.stability == "stable" &
-                condition.difficulty == "easy")
-
-ksh <- subset(dat, subset = condition.mode == "keep" & condition.stability == "stable" &
-                condition.difficulty == "hard")
-
-kde <- subset(dat, subset = condition.mode == "keep" & condition.stability == "dynamic" &
-                condition.difficulty == "easy")
-
-kdh <- subset(dat, subset = condition.mode == "keep" & condition.stability == "dynamic" &
-                condition.difficulty == "hard")
-
-lines(kse$trial, kse$total, col = col.vec[1])
-lines(ksh$trial, ksh$total, col = col.vec[2])
-lines(kde$trial, kde$total, col = col.vec[1], lty = 2)
-lines(kdh$trial, kdh$total, col = col.vec[2], lty = 2)
-
-# Plot individual conditions
-
-design.matrix <- expand.grid("condition.difficulty" = c("easy", "hard"),
-                             "condition.stability" = c("stable", "dynamic"),
-                             "condition.mode" = c("peek", "keep"), stringsAsFactors = F
-)
-
-par(mar = c(5, 4, 2, 1))
-
-
-for(i in 1:nrow(design.matrix)) {
-  
-  condition.difficulty.i <- design.matrix$condition.difficulty[i]
-  condition.stability.i <- design.matrix$condition.stability[i]
-  condition.mode.i <- design.matrix$condition.mode[i]
-
-  temp <- pk.r %>% filter(condition.difficulty == condition.difficulty.i & 
-                   condition.stability == condition.stability.i & 
-                   condition.mode == condition.mode.i) %>%
-          arrange(workerid, trial.c)
-  
-  plot(1, xlim = c(1, 200), ylim = c(-600, 800), type = "n", 
-       xlab = "Trial", ylab = "Total", 
-       main = paste(condition.difficulty.i, condition.stability.i, condition.mode.i))
-  
-  abline(v = 100, col = gray(.5, alpha = .5))
-  abline(h = 0, lty = 1, lwd = 1)
-  
-  # Add individual participants
-  
-  for(workerid.i in unique(temp$workerid)) {
-    
-    temp.2 <- subset(temp, workerid == workerid.i)
-    
-    lines(temp.2$trial.c, temp.2$total, col = gray(0, alpha = .1))
-    
-  }
-    
-  # Add average line  
-  means <- aggregate(total ~ trial.c, data = temp, FUN = mean)
-  
-  if(condition.stability.i == "stable") {lty.temp <- 1}
-  if(condition.stability.i == "dynamic") {lty.temp <- 2}
-  if(condition.difficulty.i == "easy") {col.temp <- col.vec[1]}
-  if(condition.difficulty.i == "hard") {col.temp <- col.vec[2]}
-  
-  lines(means$trial.c, means$total, col = col.temp, lty = lty.temp, lwd = 2)
-
-}
-
-}
-
-# Point totals by half
-{
-# First half
-
-library(beanplot)
-beanplot(total.points.fh ~ condition.mode + condition.difficulty + condition.stability, data = pk.p,
-         col = lapply(rep(c(1, 2), each = 2, times = 4), function(x) {col.vec[x]}),
-         main = "Total points Trials 1-100", what = c(0, 1, 1, 1)
-)
-
-# Second Half
-
-
-library(beanplot)
-beanplot(total.points.sh ~ condition.mode + condition.difficulty + condition.stability, data = pk.p,
-         col = lapply(rep(c(1, 2), each = 2, times = 4), function(x) {col.vec[x]}),
-         main = "Total points Trials 101-200", what = c(0, 1, 1, 1)
-)
-
-# All trials
-
-library(beanplot)
-beanplot(total.points ~ condition.mode + condition.difficulty + condition.stability, data = pk.p,
-         col = lapply(rep(c(1, 2), each = 2, times = 4), function(x) {col.vec[x]}),
-         main = "Total points Trials 1-200", what = c(0, 1, 1, 1)
-)
-}
-
-# Peek rate by trial block
-{
-dat <- aggregate(peek.bin ~ condition.difficulty + condition.stability + trial.c.cut20, 
-                  data = subset(pk.r, condition.mode == "peek"), FUN = mean)
-
-plot(1, xlim = c(1, 10), ylim = c(0, .5), main = "Peek Rate by Trial Block", ylab = "p(peek)", xaxt= "n", type = "n", xlab = "Trial Block")
-axis(1, at = 1:10, labels = unique(dat$trial.c.cut20))
-
-abline(v = 5.5, col = "gray", lty = 1, lwd = .5)
-
-
-with(subset(dat, condition.difficulty == "hard" & condition.stability == "stable"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[2], lwd = 2))
-
-with(subset(dat, condition.difficulty == "hard" & condition.stability == "dynamic"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[2], lty = 2, lwd = 2))
-
-with(subset(dat, condition.difficulty == "easy" & condition.stability == "stable"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[1], lwd = 2))
-
-with(subset(dat, condition.difficulty == "easy" & condition.stability == "dynamic"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[1], lty = 2, lwd = 2))
-
-legend("bottomright", c("Easy - Stable", "Easy - Dynamic", "Hard - Stable", "Hard - Dynamic"), 
-       col = col.vec[rep(1:2, each = 2)], 
-       lty = rep(1:2, times = 2))
-}
-
-# Option switch rate by trial block
-{
-  par(mfrow = c(1, 2))
-  
-  dat <- aggregate(selection.switch ~ condition.difficulty + condition.stability + trial.c.cut20, 
-                   data = subset(pk.r, condition.mode == "peek"), FUN = mean, na.rm = T)
-  
-  plot(1, xlim = c(1, 10), ylim = c(0, .8), main = "p(Change option) by Trial Block\nPeeks and Keeps Conditions", ylab = "p(peek)", xaxt= "n", type = "n", xlab = "Trial Block")
-  axis(1, at = 1:10, labels = unique(dat$trial.c.cut20))
-  
-  abline(v = 5.5, col = "gray", lty = 1, lwd = .5)
-  
-  
-  with(subset(dat, condition.difficulty == "hard" & condition.stability == "stable"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[2], lwd = 2))
-  
-  with(subset(dat, condition.difficulty == "hard" & condition.stability == "dynamic"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[2], lty = 2, lwd = 2))
-  
-  with(subset(dat, condition.difficulty == "easy" & condition.stability == "stable"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[1], lwd = 2))
-  
-  with(subset(dat, condition.difficulty == "easy" & condition.stability == "dynamic"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[1], lty = 2, lwd = 2))
-  
-  legend("bottomright", c("Easy - Stable", "Easy - Dynamic", "Hard - Stable", "Hard - Dynamic"), 
-         col = col.vec[rep(1:2, each = 2)], 
-         lty = rep(1:2, times = 2))
-  
-  
-  
-  dat <- aggregate(selection.switch ~ condition.difficulty + condition.stability + trial.c.cut20, 
-                   data = subset(pk.r, condition.mode == "keep"), FUN = mean, na.rm = T)
-  
-  plot(1, xlim = c(1, 10), ylim = c(0, .8), main = "p(Change option) by Trial Block\nKeeps Only Conditions", ylab = "p(peek)", xaxt= "n", type = "n", xlab = "Trial Block")
-  axis(1, at = 1:10, labels = unique(dat$trial.c.cut20))
-  
-  abline(v = 5.5, col = "gray", lty = 1, lwd = .5)
-  
-  
-  with(subset(dat, condition.difficulty == "hard" & condition.stability == "stable"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[2], lwd = 2))
-  
-  with(subset(dat, condition.difficulty == "hard" & condition.stability == "dynamic"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[2], lty = 2, lwd = 2))
-  
-  with(subset(dat, condition.difficulty == "easy" & condition.stability == "stable"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[1], lwd = 2))
-  
-  with(subset(dat, condition.difficulty == "easy" & condition.stability == "dynamic"), 
-       lines(trial.c.cut20, selection.switch, col = col.vec[1], lty = 2, lwd = 2))
-  
-  legend("bottomright", c("Easy - Stable", "Easy - Dynamic", "Hard - Stable", "Hard - Dynamic"), 
-         col = col.vec[rep(1:2, each = 2)], 
-         lty = rep(1:2, times = 2))
-  
-}
-
-# Participant level peek rate
-{
-beanplot(p.peeks ~ condition.difficulty + condition.stability, 
-         data = subset(pk.p, condition.mode == "peek"),
-         col = lapply(c(1, 2, 1, 2), function(x) {col.vec[x]}),
-         main = "Participant level peek rate by condition",
-         ylab = "Peek rate"
-         )
-}
-
-# Peek vs. Keep Response times
-{
-par(mfrow = c(1, 3))
-with(subset(pk, response.time > 0 & response.time < 10 & mode == "peek" & condition.mode == "peek"), 
-     hist(response.time, main = "Peek Condition\nPeek RT"))
-with(subset(pk, response.time > 0 & response.time < 10 & mode == "keep" & condition.mode == "peek"), 
-     hist(response.time, main = "Peek Condition\nKeep RT"))
-with(subset(pk, response.time > 0 & response.time < 10 & condition.mode == "keep"), 
-     hist(response.time, main = "Keep Condition\nKeep RT"))
-}
-
-# Trial level relationship between option switching and peeking
-{
-with(subset(pk.r, condition.mode == "peek"), 
-     plot(table(selection.switch, peek.bin),
-          main = "p(Peek | Option Switch)\nTrials 1-200",
-          xlab = "Switch option",
-          ylab = "Peek")
+# Top plot
+
+par(mar = rep(0, 4))
+
+plot(1, xlim = c(0, 1), ylim = c(0, 1), 
+     xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", bty = "n")
+
+text(rep(.5, 4), 
+     c(.7, .45, .25, .05), 
+     c(worker.name, paste("Type =", game.type), 
+       paste("N =", n.options), 
+       paste("sd =", option.sd)),
+     cex = c(2, 1.5, 1.5, 1.5)
      )
+     
+#paste(worker.i, "\n", game.type.i, ", n = ", n.options.i, ", sd = ", option.sd.i, sep = ""), cex = 2)
+
+par(mar = c(5, 4, 4, 1) + .1)
+
+
+for(game.i in 1:games.to.plot) {
+
+  selection.vec <- selection.ls[[game.i]]
+  outcome.vec <- outcome.ls[[game.i]]
+  action.vec <- action.ls[[game.i]]
+  best.option <- best.option.vec[game.i]
+  
+  n.trials <- length(selection.vec)
+  
+  reward.vec <- outcome.vec
+  reward.vec[action.vec == "peek"] <- 0
+  
+  cumreward.vec <- cumsum(reward.vec)
+  
+  peekreward.vec <- outcome.vec
+  peekreward.vec[action.vec == "keep"] <- 0
+  cumpeekreward.vec <- cumsum(peekreward.vec)
+  
+  select.best.vec <- selection.vec == best.option
+  
+  option.switch.vec <- c(NA, selection.vec[2:n.trials] != selection.vec[1:(n.trials - 1)])
+  
+   action.switch.vec <- c(NA, action.vec[2:n.trials] != action.vec[1:(n.trials - 1)])
+  
+  
+par(mar = c(5, 5, 4, 3))
+
+plot(1, xlim = c(0, 120), ylim = c(-500, 500), type = "n", 
+     main = paste("Game", game.i), 
+     ylab = "Cumulative Points", xlab = "Trial", 
+     xaxt = "n", yaxt = "n", bty = "n", cex.main = 1.5)
+
+
+par(xpd = NA)
+
+segments(20, 510, 40, 510, col = col.vec[2], lwd = 2)
+text(20, 530, "Peeks", adj = 0)
+
+segments(60, 510, 80, 510, col = col.vec[1], lwd = 2)
+text(60, 530, "Keeps", adj = 0)
+
+par(xpd = FALSE)
+
+axis(1, at = seq(0, 100, 20))
+axis(2, at = seq(-500, 500, 100), las = 1)
+
+# Add margin text for final points
+
+text(103, cumreward.vec[length(cumreward.vec)], 
+    cumreward.vec[length(cumreward.vec)], adj = 0)
+
+
+text(103, cumpeekreward.vec[length(cumpeekreward.vec)], 
+      cumpeekreward.vec[length(cumpeekreward.vec)], adj = 0)
+
+
+h.line.loc <- seq(-500, 500, 100)
+v.line.loc <- seq(0, 100, 20)
+
+segments(rep(0, length(h.line.loc)), 
+         h.line.loc, 
+         rep(100, length(h.line.loc)),
+         h.line.loc, col = gray(.9)
+)
+
+segments(
+         v.line.loc, 
+         rep(-500, length(v.line.loc)), 
+         v.line.loc, 
+         rep(500, length(v.line.loc)),
+         col = gray(.9)
+)
+
+abline(h = 0, col = "red", lty = 2)
+
+lines(1:100, cumreward.vec, col = col.vec[1], lwd = 2)
+lines(1:100, cumpeekreward.vec, col = col.vec[2], lwd = 2)
+
+peek.trials <- which(action.vec == "peek")
+keep.trials <- which(action.vec == "keep")
+
+pch.vec <- rep(21, n.trials)
+#pch.vec[game.data$option.switch == TRUE] <- 24
+
+# Add peek symbols
+
+points(peek.trials, 
+       cumpeekreward.vec[peek.trials], 
+       pch = pch.vec[peek.trials], 
+       bg = transparent(col.vec[2], .6), 
+       cex = 1.2, 
+       col = gray(.3))
+
+# Add keep symbols
+points(keep.trials, 
+       cumreward.vec[keep.trials], 
+       pch = pch.vec[keep.trials], 
+       bg = transparent(col.vec[1], .6), 
+       cex = 1.2, 
+       col = gray(.3))
+
+
+# Add select best line
+
+text(102, -195, "Select Best", adj = 0)
+select.best.trials <- which(select.best.vec == TRUE)
+rect(select.best.trials - .5, 
+     rep(-200, length(select.best.trials)),
+     select.best.trials + .5,
+     rep(-190, length(select.best.trials)),
+     col = col.vec[4], lwd = .5
+     )
+
+# Add option switch line
+
+text(102, -245, "Option Change", adj = 0)
+option.switch.trials <- which(option.switch.vec == TRUE)
+rect(option.switch.trials - .5, 
+     rep(-250, length(option.switch.trials)),
+     option.switch.trials + .5,
+     rep(-240, length(option.switch.trials)),
+     col = col.vec[5], lwd = .5
+)
+
+
+# Add action switch line
+
+text(102, -295, "Action Change", adj = 0)
+action.switch.trials <- which(action.switch.vec == TRUE)
+rect(action.switch.trials - .5, 
+     rep(-300, length(action.switch.trials)),
+     action.switch.trials + .5,
+     rep(-290, length(action.switch.trials)),
+     col = col.vec[6], lwd = .5
+)
+
+
+# Add mean totals
+# {
+# bar.min <- -450
+# bar.height.max <- 200 
+# 
+# rect(0, bar.min, 30, bar.min + bar.height.max, col = "white", border = NA)
+# 
+# rect(0, bar.min, 10, 
+#      bar.min + sum(game.data$mode == "peek") / 100 * bar.height.max)
+# 
+# text(5, bar.min + sum(game.data$mode == "peek") / 100 * bar.height.max,
+#      sum(game.data$mode == "peek"), pos = 3)
+# 
+# text(5, bar.min, labels = "p", pos = 1)
+# 
+# rect(10, bar.min, 20,
+#      bar.min + sum(game.data$option.switch, na.rm = T) / 100 * bar.height.max)
+# 
+# text(15, bar.min + sum(game.data$option.switch, na.rm = T) / 100 * bar.height.max,
+#      sum(game.data$option.switch, na.rm = T), pos = 3)
+# 
+# text(15, bar.min, labels = "os", pos = 1)
+# 
+# rect(20, bar.min, 30,
+#      bar.min +  sum(game.data$mode.switch, na.rm = T) / 100 * bar.height.max)
+# 
+# text(25, bar.min + sum(game.data$mode.switch, na.rm = T) / 100 * bar.height.max,
+#      sum(game.data$mode.switch, na.rm = T), pos = 3)
+# 
+# text(25, bar.min, labels = "ms", pos = 1)
+# }
+
 }
 
 }
 @
 
-<<echo = F, eval = F>>=
-# ------------------
-# Analyses
-# ------------------
-{
 
 
+\section{Questions}
 
-# Does peeking protect you against early negative point values?
+\begin(itemize)
 
+  \item Do people benefit from peeks or not?
+  \item In PAK, do people alternate or do they utilize a PTK strategy?
 
-test <- subset(pk.r, trial.c == 50 & condition.difficulty == "hard")
-t.test(total ~ condition.mode, data = test)
-
-
-
-# Option Switching
-
-selswitch.cond.bmod <- MCMCglmm(selectionswitch.mean ~ condition.difficulty + condition.stability + condition.mode, data = pk.p)
-
-selswitch.demo.bmod <-MCMCglmm(selectionswitch.mean ~ barratt.all + 
-                                 reg.sch.all + max.nen.all, 
-                                data = subset(pk.p.r, demo.valid))
-
-selswitch.bmod <- MCMCglmm(selectionswitch.mean ~  barratt.all + reg.sch.all + max.nen.all,
-                               data = subset(pk.p, 
-                                             subset = demo.valid))
-
-
-#  People switch more in the difficult condition. Slight evidence that highly impulsive
-#  people switch more.
-
-
-# Peeking
-
-peeks.cond.bmod <- MCMCglmm(n.peeks ~ condition.difficulty * condition.stability, 
-                        data = subset(pk.p, subset = condition.mode == "peek"))
-
-
-peeks.demo.bmod <- MCMCglmm(n.peeks ~ sex + age + barratt.all + reg.sch.all + max.nen.all, 
-                            data = subset(pk.p, 
-                                          subset = condition.mode == "peek" & demo.valid))
-
-
-peeks.bmod <- MCMCglmm(n.peeks ~ sex + age + barratt.all + reg.sch.all + max.nen.all +
-                              condition.difficulty + condition.stability
-                              , 
-                            data = subset(pk.p, 
-                                          subset = condition.mode == "peek" & demo.valid))
-# Men peek less than women, no other effects of personality or conditions on peeking.
-
-
-peeks.cond.trial.bmod <- MCMCglmm(peek.bin ~ trial.c + condition.difficulty + condition.stability, 
-                                  random = ~workerid, data = subset(pk.r, condition.mode == "peek"),
-                                  family = "categorical", nitt = 3000, burnin = 500)
-# Less peeking on later trials
-
-
-# Mode Switching
-
-modeswitch.cond.bmod <- MCMCglmm(modeswitch.mean ~ condition.difficulty * condition.stability, 
-                            data = subset(pk.p, subset = condition.mode == "peek"))
-   # No effect of conditions on mode switching
-
-
-modeswitch.demo.bmod <- MCMCglmm(modeswitch.mean ~ sex + age + barratt.all + reg.sch.all + max.nen.all, 
-                                 data = subset(pk.p, 
-                                               subset = condition.mode == "peek" & demo.valid))
-  # Maximizers switch modes more often
-
-
-modeswitch.cond.trial.bmod <- MCMCglmm(mode.switch ~ condition.difficulty * condition.stability + trial.c, 
-                                       random = ~workerid,
-                                        data = subset(pk.r, subset = condition.mode == "peek"),
-                                       family = "categorical", nitt = 3000, burnin = 500
-                                       )
-  # 
-
-# Response Times
-
-rt.cond.bmod <- MCMCglmm(rt.l.median ~ condition.difficulty + condition.stability + condition.mode, 
-                         data = subset(pk.p, subset = is.finite(rt.l.median)))
-    # No effect of conditions on overall rt
-
-rt.demo.bmod <- MCMCglmm(rt.l.median ~ sex + age + barratt.all + reg.sch.all + max.nen.all,
-                         data = subset(pk.p, subset = is.finite(rt.l.median) & demo.valid))
-    # Maximizers are slower
-
-rt.cond.trial.bmod <- MCMCglmm(rt.l ~ condition.difficulty + condition.stability + mode + trial.c, 
-                         random = ~workerid,
-                         data = subset(pk.r, subset = condition.mode == "peek" & is.finite(rt.l)))
-    # People are slower on peeks than keeps (suggesting obesrvation?!) and are faster on later trials
-}
-@
-
+\end{itemize}
 
 
 \section{Method}
 
 \subsection{Participants}
 
-Participants (N = \Sexpr{nrow(pk.p.r)}) were recruited from the Amazon Mechanical Turk\footnote{We restricted our study to workers who had completed at least 100 HITs with at least a 95\% HIT acceptance rate.}. For their paritcipation, workers received a guaranteed reward of 50 cents with the possibility of a bonus up to \$1.00. \Sexpr{sum(pk.p.r$sex == "female")} (\Sexpr{round(mean(pk.p.r$sex == "female"), 2) * 100}\%) were female and the mean age was (\Sexpr{round(mean(pk.p.r$age), 2)}) (IQR: [\Sexpr{round(quantile(pk.p.r$age, .25), 2)}, \Sexpr{round(quantile(pk.p.r$age, .75), 2)}])
+Participants (N = \Sexpr{nrow(participants)}) were recruited from the Amazon Mechanical Turk\footnote{We restricted our study to workers who had completed at least 100 HITs with at least a 95\% HIT acceptance rate.}. For their participation, workers received a guaranteed reward of 50 cents with the possibility of a bonus up to \$1.00. \Sexpr{sum(participants$sex == 2)} (\Sexpr{round(mean(participants$sex == 2), 2) * 100}\%) were female and the mean age was (\Sexpr{round(mean(participants$age), 2)}) (IQR: [\Sexpr{round(quantile(participants$age, .25), 2)}, \Sexpr{round(quantile(participants$age, .75), 2)}])
 
 \subsection{Procedure}
 
-We created 6 sequences of 200 integers following a rounded Normal distribution with means of -5, 0 or +5 (corresponding to the positive, neutral, and negative options) and standard deviation of 10 or 30 (corresponding to the easy and difficult distributions)\footnote{In order to ensure that the sample distributions closely matched the desired means and standard deviations, we repeatedly generated candidate sample distributions until we found ones whose sample means were within 0.10 of the desired mean and whose standard deviations were within 1.0 of the desired value. Additionally, we truncated the distributions so the minimum and maximum values did not exceed -99 and +99 respectively.}. In the \textit{dynamic} condition, the location of the positive and negative options changed places on trial 101, while in the \textit{stable} condition there was no change. To prevent any option order counfounds, we employed all 6 possible orderings of the options on the screen as a between-subjects factor. However, for all of our analyses we have ignored this factor.
+We created four different environments by crossing two factors: Number of options (2 v. 4), and Option standard deviation (5 v. 20)\footnote{In order to ensure that the sample distributions closely matched the desired means and standard deviations, we repeatedly generated candidate sample distributions until we found ones whose sample means were within 0.10 of the desired mean and whose standard deviations were within 1.0 of the desired value. Additionally, we truncated the distributions so the minimum and maximum values did not exceed -99 and +99 respectively.}. The four environments are displayed in Figure \ref{fig:distributions}. The order of options was randomized for each participant.
 
-Each participant was randomly assigned to one of the 48 conditions (Response Mode (Peeks vs. Keeps) x Stimuli Difficulty (Easy vs. Hard) x Environment Stability (Stable vs. Dynamic) x Option Order). In both response mode conditions, participants were told that the goal of the game was to earn as many points as possible over the course of 200 trials using their 200 Keeps (for the Keeps condition) or their 200 Peeks and Keeps (for the Peeks condition). To reinforce the idea that peeking introduces an opportunity cost, Those in the Peeks condition were specifically told that using a Peek action would `use a trial.' Participants were not explicitly told that the options would be either stable or dynamic. Instead, all participants were told that at any given point in the game, one of the options would be the best one.
+% distributions.pdf
+<<echo = F, results = "hide">>=
 
-After completing all 200 trials, participants completed three personality questionnaires (the XX, YYY, and the ZZZ) and an additional post-study questionnaire that elicited their overall impressions of the game.
+pdf("figures/distributions.pdf", width = 10, height = 7)
+
+par(mfrow = c(2, 2))
+par(mar = c(4, 3, 4, 1))
+
+option.vec <- c(1, 3, 1, 3)
+sd.vec <- c(5, 5, 20, 20)
+
+col.vec <- piratepal("google", length.out = 4)[c(4, 2, 1, 3)]
+ball.col.vec <- piratepal("google", length.out = 4, trans = .4)[c(4, 2, 2, 2)]
+ball.outline.vec <- piratepal("google", length.out = 4, trans = 0)[c(4, 2, 2, 2)]
+
+
+for(i in 1:4) {
+  
+  options.i <- option.vec[i]
+  sd.i <- sd.vec[i]
+  
+  
+  if(sd.i == 5) {plot.height <- .1 ; ball.height <- .11 ; ball.sd <- .007 ; text.height <- .15 ; line.width <- .02}
+  if(sd.i == 20) {plot.height <- .03 ; ball.height <- .032 ; ball.sd <- .0025 ; text.height <- .0475 ; line.width <- .02}
+  
+  good.pdf <- function(x) {return(dnorm(x, mean = 5, sd = sd.i))}
+  bad.pdf <- function(x) {return(dnorm(x, mean = -5, sd = sd.i))} 
+  bad2.pdf <- function(x) {return(dnorm(x - 2, mean = -5, sd = sd.i))} 
+  bad3.pdf <- function(x) {return(dnorm(x + 2, mean = -5, sd = sd.i))} 
+  
+  plot(1, xlim = c(-50, 50), ylim = c(0, plot.height), xlab = "", ylab = "", main = "", yaxt = "n")
+
+  curve(good.pdf, from = -50, to = 50, col = col.vec[1], lwd = 3, ylim = c(0, .12), add = T)
+  
+  curve(bad.pdf, from = -50, to = 50, col = col.vec[2], lwd = 3, ylim = c(0, .1), add = T)
+  
+  
+  if (i %in% c(2, 4)) {
+    
+    curve(bad2.pdf, from = -50, to = 50, col = col.vec[3], lwd = 3, ylim = c(0, .1), add = T)
+    curve(bad3.pdf, from = -50, to = 50, col = col.vec[4], lwd = 3, ylim = c(0, .1), add = T)
+    
+  }
+  
+  
+  segments(0, 0, 0, 100, lty = 2)
+  
+
+
+  
+  mtext(paste("Env", i), side = 3, line = 2, cex = 1.5)
+  mtext(paste("N = ", option.vec[i] + 1, ", sd = ", sd.vec[i], sep = ""), side = 3, line = .5)
+#  mtext("Density", side = 2, srt = 90, line = .5, cex = .8)
+  mtext("Outcome", side = 1, line = 2.5, cex = .8)
+  
+}
+  
+  dev.off()
+
+@
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/distributions.pdf}
+\caption{4 decision environments used in Study 1. Each environment has one good option (in blue) with a positive expected value of +5. All other (bad) options have a negative expected value of -5.}
+\label{fig:distributions}
+\end{figure}
+
+
+Each participant was randomly assigned to one of the 12 conditions (Response Mode (K v. PAK v. PTK) x Environment (1 v 2 v 3 v 4). In all response mode conditions, participants were told that the goal of the game was to earn as many points as possible over the course of 100 trials. To reinforce the idea that peeking introduces an opportunity cost, Those in the Peeks condition were specifically told that using a Peek action would `use a trial.'
+
+After completing the first game, participants were spontaneously given a new game to play. They were told that the options in the second game were identical to those in the first game, but that the location of the options would be randomly shuffled. Participants completed three personality questionnaires (the XX, YYY, and the ZZZ) and an additional post-study questionnaire that elicited their overall impressions of the game.
 
 \section{Results}
 
-\subsection{Point Totals}
+\subsection{Final Points}
 
-\begin{figure}
-\centering
-<<echo = F, fig.width = 10, fig.height = 10>>=
-col.vec <- brewer.pal(12, name = "Set3")[c(5:8, 5:8)]
+Distributions of final points values across all games are presented in Figure \ref{fig:pointbeans}.
 
-# Point totals by Trial
+% pointbeans.pdf
+<<echo = F, message = F, results='hide'>>=
+# --------------------------------
+#  Final point distributions by condition(s)
+# --------------------------------
+
+pdf("figures/pointbeans.pdf", width = 12, height = 7)
 {
 
-dat <- aggregate(total ~ trial.c + condition.mode + condition.difficulty + condition.stability,
-                 data = pk.r, 
-                 FUN = mean)
-
-
-layout(matrix(c(rep(1:2, each = 2, times = 2), c(3, 4, 7, 8, 5, 6, 9, 10)), byrow = T, nrow = 4, ncol = 4),
-      widths = rep(2, 4),
-      heights = c(2, 2, 3, 3))
-
-# Peeks Plot
-
-plot(1, xlim = c(1, 200), ylim = c(-150, 450), main = "Peeks and Keeps", xlab = "Trial"
-, ylab = "Total Points", type = "n", cex.main = 1.5)
-
-
-abline(h = seq(-100, 400, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 2)
-abline(h = seq(-50, 450, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 1)
-abline(v = 100, lty = 2, col = gray(.5, alpha = .5), lwd = 1)
-abline(h = 0, lty = 1, lwd = 1)
-
-
-pse <- subset(dat, subset = condition.mode == "peek" & condition.stability == "stable" &
-              condition.difficulty == "easy")
-
-psh <- subset(dat, subset = condition.mode == "peek" & condition.stability == "stable" &
-                condition.difficulty == "hard")
-
-pde <- subset(dat, subset = condition.mode == "peek" & condition.stability == "dynamic" &
-                condition.difficulty == "easy")
-
-pdh <- subset(dat, subset = condition.mode == "peek" & condition.stability == "dynamic" &
-                condition.difficulty == "hard")
-
-lines(pse$trial.c, pse$total, col = col.vec[1], lwd = 2)
-lines(psh$trial.c, psh$total, col = col.vec[2], lwd = 2)
-lines(pde$trial.c, pde$total, col = col.vec[1], lty = 2, lwd = 2)
-lines(pdh$trial.c, pdh$total, col = col.vec[2], lty = 2, lwd = 2)
-
-legend(0, 400, 
-       c("Easy - Stable", "Hard - Stable", "Easy - Dynamic", "Hard - Dynamic"),
-       lty = c(1, 2, 1, 2),
-       col = col.vec[c(1, 2, 1, 2)],
-       bg = "white"
-       )
-
-
-
-# Keeps plot
-
-plot(1, xlim = c(1, 200), ylim = c(-150, 450), main = "Keeps Only", xlab = "Trial"
-     , ylab = "Total Points", type = "n", cex.main = 1.5)
-
-abline(h = seq(-100, 400, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 2)
-abline(h = seq(-50, 450, 100), lty = 1, col = gray(.5, alpha = .1), lwd = 1)
-abline(v = 100, lty = 2, col = gray(.5, alpha = .5), lwd = 1)
-abline(h = 0, lty = 1, lwd = 1)
-
-kse <- subset(dat, subset = condition.mode == "keep" & condition.stability == "stable" &
-                condition.difficulty == "easy")
-
-ksh <- subset(dat, subset = condition.mode == "keep" & condition.stability == "stable" &
-                condition.difficulty == "hard")
-
-kde <- subset(dat, subset = condition.mode == "keep" & condition.stability == "dynamic" &
-                condition.difficulty == "easy")
-
-kdh <- subset(dat, subset = condition.mode == "keep" & condition.stability == "dynamic" &
-                condition.difficulty == "hard")
-
-lines(kse$trial, kse$total, col = col.vec[1])
-lines(ksh$trial, ksh$total, col = col.vec[2])
-lines(kde$trial, kde$total, col = col.vec[1], lty = 2)
-lines(kdh$trial, kdh$total, col = col.vec[2], lty = 2)
-
-legend(0, 400, 
-       c("Easy - Stable", "Hard - Stable", "Easy - Dynamic", "Hard - Dynamic"),
-       lty = c(1, 2, 1, 2),
-       col = col.vec[c(1, 2, 1, 2)],
-       bg = "white"
-       )
-
-
-
-# Plot individual conditions
-
-design.matrix <- expand.grid("condition.difficulty" = c("easy", "hard"),
-                             "condition.stability" = c("stable", "dynamic"),
-                             "condition.mode" = c("peek", "keep"), stringsAsFactors = F
-)
-
-par(mar = c(5, 4, 2, 1))
-
-
-for(i in 1:nrow(design.matrix)) {
+bean.locations <- c(1:3, 4:6 + .5, 7:9 + 1, 10:12 + 1.5)
   
-  condition.difficulty.i <- design.matrix$condition.difficulty[i]
-  condition.stability.i <- design.matrix$condition.stability[i]
-  condition.mode.i <- design.matrix$condition.mode[i]
+  par(mar = c(1, 6, 8, 1))  
+  col.vec <- rep(piratepal(palette = "google", trans = 0, length.out = 3), 4)
+  
 
-  temp <- pk.r %>% filter(condition.difficulty == condition.difficulty.i & 
-                   condition.stability == condition.stability.i & 
-                   condition.mode == condition.mode.i) %>%
-          arrange(workerid, trial.c)
+  plot(1, xlim = c(0, 14.5), ylim = c(-500, 600), xaxt = "n", xlab = "", type = "n", yaxt = "n", ylab = "")
   
-  plot(1, xlim = c(1, 200), ylim = c(-600, 800), type = "n", 
-       xlab = "Trial", ylab = "Total", 
-       main = paste(condition.difficulty.i, condition.stability.i, condition.mode.i))
-  
-  abline(v = 100, col = gray(.5, alpha = .5))
-  abline(h = 0, lty = 1, lwd = 1)
-  
-  # Add individual participants
-  
-  for(workerid.i in unique(temp$workerid)) {
+  mtext(text = rep(c("Keep", "PAK", "PTK"), 4), at = bean.locations, side = 3, line = .5, cex = 1.3)
+  mtext(text = paste("Env", 1:4), at = bean.locations[c(2, 5, 8, 11)], side = 3, line = 4, cex = 2)
+ mtext(text = paste(c("N = 2, sd = 5", "N = 2, sd = 20", "N = 4, sd = 5", "N = 4, sd = 20")), at = bean.locations[c(2, 5, 8, 11)], side = 3, line = 2, cex = 2)
     
-    temp.2 <- subset(temp, workerid == workerid.i)
     
-    lines(temp.2$trial.c, temp.2$total, col = gray(0, alpha = .1))
+  mtext("Points Earned", side = 2, las = 0, line = 3, cex = 1.5)
+  
+  axis(side = 2, labels = seq(-500, 500, 500), at = seq(-500, 500, 500), las = 1, cex.axis = 1.2)
+  
+  rect(-1000, -1000, 1000, 1000, col = gray(.99), border = NA)
+  abline(h = seq(-500, 500, 100), col = gray(.9), lwd = c(1, 3))
+  abline(h = 0, col = "red", lwd = 2)
+  
+  
+    beanplot(g1.final.points ~ game.type + n.options + option.sd, 
+             data = subset(participants, is.finite(g1.final.points)), beanlines = "median", 
+             ylim = c(-500, 600), main = "", 
+             col = lapply(1:12, FUN = function(x) {c(transparent(col.vec[x], .8), gray(0), "white", "black")}), 
+             at = bean.locations, xaxt = "n", cex.main = 1.5,
+             beanlinewd = 5, what = c(0, 1, 1, 1), cutmax = 510, add = T, maxwidth = 1)
+    
+    
+    medians <- aggregate(g1.final.points ~ game.type + n.options + option.sd, FUN = median, 
+                         data = subset(participants,is.finite(g1.final.points)))
+    
+   # rect(bean.locations - .3, medians[,4] + 20, bean.locations + .3, medians[,4] + 120, col = gray(1, alpha = .8), border = NA)
+    
+    text(x = bean.locations, y = 525, pos = 3, labels = round(medians[,4], 0), cex = 1.5)
+ 
     
   }
-    
-  # Add average line  
-  means <- aggregate(total ~ trial.c, data = temp, FUN = mean)
   
-  if(condition.stability.i == "stable") {lty.temp <- 1}
-  if(condition.stability.i == "dynamic") {lty.temp <- 2}
-  if(condition.difficulty.i == "easy") {col.temp <- col.vec[1]}
-  if(condition.difficulty.i == "hard") {col.temp <- col.vec[2]}
-  
-  lines(means$trial.c, means$total, col = col.temp, lty = lty.temp, lwd = 2)
-
-}
-
-}
-
-@
-\caption{\label{fig:pointsbytrial}Cumulative point tradjectories across trials for all conditions and participants. The two panels in the top row show the average cumulative point values across participants for each experimental condition. The bottom 8 plots in the bottom two rows show the mean tradjectory of each condition separately, with individual lines plotted for each individual participant.}
-\end{figure}
-
-
-Summary statistics of the cumulative point totals earned by participants in each of the experimental conditions are shown in Table~\ref{table:MeasuresTbl}. Additionally, group mean and individual level cumulative point values across trials are shown in Figure~/ref{fig:pointsbytrial}. To see which experimental variables affected point totals, we conducted a Bayesian regression analysis with each participant's point total as the dependent variable and the three experimental conditions as independent variables. Results are shown in Table~\ref{table:totals.model}. We found a credible negative effect of the difficult stimuli condition for both trials 1-100 and trials 101-200, suggesting that participants did worse in the difficult environment than the easy environment. For trials 101-200 we found that participants in the dynamic condition performed credibly worse than those in the stable condition.
-
-% Regression model HDIs
-<<echo = F, results = 'asis'>>=
-# Predicting Point Totals
-
-pointsfh.cond.bmod <- MCMCglmm(total.points.fh ~ condition.mode + condition.difficulty + condition.stability, data = pk.p, nitt = 5000, verbose = F)
-
-pointssh.cond.bmod <- MCMCglmm(total.points.sh ~ condition.mode + condition.difficulty + condition.stability, data = pk.p, nitt = 5000, verbose = F)
-
-pointsall.cond.bmod <- MCMCglmm(total.points ~ condition.mode + condition.difficulty + condition.stability, data = pk.p, nitt = 5000, verbose = F)
-
-points.all.solutions.combined <- as.data.frame(cbind(summary(pointsfh.cond.bmod)$solutions[2:4,1:3],
-                                       summary(pointssh.cond.bmod)$solutions[2:4,1:3],
-                                       summary(pointsall.cond.bmod)$solutions[2:4,1:3]
-                                       ))
-
-points.all.solutions.combined$condition <- c("Mode = Peek", "Difficulty = Hard", "Stability = Stable")
-
-points.all.solutions.combined[,1] <- paste(round(points.all.solutions.combined[, 1], 0), " [", 
-                                           round(points.all.solutions.combined[, 2], 0), ", ",
-                                           round(points.all.solutions.combined[, 3], 0), "]", 
-                                           sep = ""
-                                           )
-points.all.solutions.combined[,4] <- paste(round(points.all.solutions.combined[, 4], 0), " [", 
-                                           round(points.all.solutions.combined[, 5], 0), ", ",
-                                           round(points.all.solutions.combined[, 6], 0), "]", 
-                                           sep = ""
-                                           )
-points.all.solutions.combined[,7] <- paste(round(points.all.solutions.combined[, 7], 0), " [", 
-                                           round(points.all.solutions.combined[, 8], 0), ", ",
-                                           round(points.all.solutions.combined[, 9], 0), "]", 
-                                           sep = ""
-                                           )
-
-points.all.solutions.combined <- points.all.solutions.combined[,c(10, 1, 4, 7)]
-names(points.all.solutions.combined) <- c("Condition", "Trials 1 - 100", "Trials 101 - 200", "All Trials")
-
-
-
-point.totals.model.desc <- "Posterior means and 95\\% highest density intervals of the effects of experimental conditions on point totals."
-
-point.totals.model.table.x <- xtable(points.all.solutions.combined, 
-                               caption = point.totals.model.desc, 
-                               label = "table:totals.model", 
-                               align = c("l", "l", "l", "l", "l"))
-
-print(point.totals.model.table.x, include.rownames = F,
-      sanitize.text.function = function(x){x},  
-      floating.environment = getOption("xtable.floating.environment", "table*"))
-
+dev.off()
 @
 
-
-% Cumulative point total table
-<<echo = F, results = 'asis'>>=
-
-point.totals.table <- pk.p.r %>%
-  group_by(condition.mode, condition.difficulty, condition.stability) %>%
-  summarise(
-    First.Half = hdi.text.fun(total.points.fh, numSavedSteps = 1000, digits = 0, wordy = F),
-    Second.Half = hdi.text.fun(total.points.sh, numSavedSteps = 1000, digits = 0, wordy = F),
-    All = hdi.text.fun(total.points, numSavedSteps = 1000, digits = 0, wordy = F)
-    )
-
-names(point.totals.table) <- c("Mode", "Difficulty", "Stability", "Trials 1-100", "Trials 101-200", "All Trials")
-
-point.totals.table.desc <- "Sample means and 95\\% highest density intervals of cumulative point values earned by participants within a specified trial range."
-
-point.totals.table.x <- xtable(as.data.frame(point.totals.table), 
-                               caption = point.totals.table.desc, 
-                               label = "table:MeasuresTbl", 
-                               align = c("l", "l", "l", "l", "l", "l", "l"))
-
-print(point.totals.table.x, include.rownames = F,
-      sanitize.text.function = function(x){x},  
-      floating.environment = getOption("xtable.floating.environment", "table*"))
-@
-
-\subsection{Observation Rates}
 
 \begin{figure}
-\centering
-<<fig.width = 12, fig.height = 5, echo = F>>=
+\includegraphics[width=\columnwidth]{figures/pointbeans}
+\caption{Distributions of final points earned by participants in each decision environment and experimental condition. Median point values are indicated by the dark black lines and are printed above each distribution.}
+\label{fig:pointbeans}
+\end{figure}
 
-col.vec <- brewer.pal(12, name = "Set3")[c(5:8, 5:8)]
+To see which game and environmental factors affected point totals, we calculated a Bayesian ANOVA using the BayesFactor package in R.
+
+<<echo = F, results = 'hide', message = F>>=
+
+participants$n.options.f <- as.factor(participants$n.options)
+participants$option.sd.f <- as.factor(participants$option.sd)
+participants$game.type.f <- as.factor(participants$game.type)
+participants$environment.f <- as.factor(participants$environment)
+
+
+# Version 1: All Data
+
+points.frequentist <- lm(g1.final.points ~ game.type.f * n.options.f * option.sd.f,
+                     data = subset(participants, is.finite(g1.final.points))
+                     )
+
+points.ao.bf <- anovaBF(g1.final.points ~ game.type.f * n.options.f * option.sd.f,
+                     data = subset(participants, is.finite(g1.final.points)), whichModels = "top"
+                     )
+
+points.lm.bf <- lmBF(g1.final.points ~ game.type.f + n.options.f + option.sd.f + game.type.f : n.options.f,
+                     data = subset(participants, g1.final.points > 0)
+                     )
+
+points.lm.bf.post <- posterior(points.lm.bf, iterations = 1e5)
+
+points.bf.df <- extractBF(points.ao.bf)
+row.names(points.bf.df) <- NULL
+points.bf.df$Factor <- c("Environment X Gamee Type X Options",
+                      "Game Type X SD",
+                      "Game Type X Options",
+                      "Options X SD",
+                      "Game Type",
+                      "Options",
+                      "SD"
+                      )
+
+points.bf.df <- points.bf.df[,c(5, 1)]
+points.bf.df[,2] <- 1 / points.bf.df[,2]
+
+points.bf.df$bf.text[points.bf.df$bf > 1000] <- "BF > 1000"
+points.bf.df$bf.text[points.bf.df$bf < 1] <- "BF < 1"
+points.bf.df$bf.text[points.bf.df$bf <= 1000 & points.bf.df$bf > 1] <- paste("BF = ", round(points.bf.df$bf[points.bf.df$bf <= 1000 & points.bf.df$bf > 1], 0))
+
+
+# Version 2: Subsetted data Only Environments 1-3 where people actually peek
+
+data.temp <- subset(participants, environment %in% 1:3 & is.finite(g1.final.points) & 
+                      (game.type %in% "k" | g1.n.peeks >= 1))
+
+
+points.frequentist2 <- lm(g1.final.points ~ game.type.f * environment.f,
+                    data = data.temp
+                     )
+
+points.ao2.bf <- anovaBF(g1.final.points ~ game.type.f + environment.f + game.type.f*environment.f,
+                     data = data.temp, whichModels = "top"
+                     )
+
+points.lm2.bf <- lmBF(g1.final.points ~ game.type.f + environment.f + game.type.f*environment.f,
+                     data = data.temp
+                     )
+
+points.lm2.bf.post <- posterior(points.lm2.bf, iterations = 1e5)
+
+
+points.bf2.df <- extractBF(points.ao2.bf)
+row.names(points.bf2.df) <- NULL
+points.bf2.df$Factor <- c("Environment X Game Type",
+                      "Environment",
+                      "Game Type"
+                      )
+
+points.bf2.df <- points.bf2.df[,c(5, 1)]
+points.bf2.df[,2] <- 1 / points.bf2.df[,2]
+
+points.bf2.df$bf.text[points.bf2.df$bf > 1000] <- "BF > 1000"
+points.bf2.df$bf.text[points.bf2.df$bf < 1] <- "BF < 1"
+points.bf2.df$bf.text[points.bf2.df$bf <= 1000 & points.bf2.df$bf > 1] <- paste("BF = ", round(points.bf2.df$bf[points.bf2.df$bf <= 1000 & points.bf2.df$bf > 1], 0))
+
+chains <- as.data.frame(points.lm2.bf.post)
+
+e1ve2.hdi <- hdi.text.fun(unlist(chains["environment.f-1"] - chains["environment.f-2"]),
+                            calculate = F, wordy = T)
+
+e1ve3.hdi <- hdi.text.fun(unlist(chains["environment.f-1"] - chains["environment.f-3"]),
+                            calculate = F, wordy = T)
+
+e2ve3.hdi <- hdi.text.fun(unlist(chains["environment.f-2"] - chains["environment.f-3"]),
+                            calculate = F, wordy = T)
+
+ptk.v.k.hdi <- hdi.text.fun(unlist(chains["game.type.f-ptk"] - chains["game.type.f-k"]),
+                            calculate = F, wordy = T)
+
+pak.v.k.hdi <- hdi.text.fun(unlist(chains["game.type.f-pak"] - chains["game.type.f-k"]),
+                            calculate = F, wordy = T)
+
+ptk.v.k.pak <- hdi.text.fun(unlist(chains["game.type.f-ptk"] - chains["game.type.f-pak"]),
+                            calculate = F, wordy = T)
+
+a <- mean(subset(participants, game.type %in% c("ptk", "pak") & is.finite(g1.n.peeks))$g1.n.peeks > 0, na.rm = T)
+
+@
+
+We entered both decision environment and game type as fixed factors. \footnote{Because performance was so poor across all game types in environment 4, we elected to withdraw these data from the ANOVA. Additionally, in the PAK and PTK conditions, we only included participants who peeked at least once (this was the case for \Sexpr{100 * round(a, 2)}\% of participants).
+
+When we include these data, the effect of game type does not appear (BF = \Sexpr{round(points.bf.df$bf[5], 2)})}. We found credible effects for the option environment (\Sexpr{subset(points.bf2.df, Factor == "Environment")$bf.text}, E1--E2 = \Sexpr{e1ve2.hdi}, E1--E3 = \Sexpr{e1ve3.hdi}, E2--E3 = \Sexpr{e1ve3.hdi}). Critically, we found a credible effect of game.type (\Sexpr{subset(points.bf2.df, Factor == "Game Type")$bf.text}: players playing PTK earned more points than those playing K (mean difference = \Sexpr{ptk.v.k.hdi}) and those playing PAK (mean difference = \Sexpr{ptk.v.k.pak}). However, there was no credible difference between PAK and K conditions (mean difference = \Sexpr{pak.v.k.hdi}). While the raw data appeared to reflect an interaction between environment and game type on points earned, the Bayes Factor for the interaction was \Sexpr{round(points.bf2.df$bf[points.bf2.df$Factor == "Environment X Game Type"], 2)} indicating slight support for the null hypothesis.
+
+\subsection{Peeking Rates}
+
+Next, we focused on the two peeking conditions. We sought to answer three questions: First, how do the overall rates of peeking differ between PAK and PTK and how does peeking change over time? Second, how do environmental factors affect peeking rates? Third, in the PAK condition, how does peeking change over time? Finally, What is the relationship between option switching and peeking? 
+
+\subsubsection{Participant-level}
+
+To see how the overall rates of peeking differed between peeking conditions, we calculated the average rate of peeking across participants at each game trial. Results are in Figure~\ref{fig:peekstime} and average peeking rates across trials are presented in Table~\ref{table:peekdf}.
+
+<<echo = F>>=
+
+peeks.frequentist <- lm(g1.n.peeks ~ game.type + n.options.f + option.sd.f,
+                     data = subset(participants, game.type %in% c("pak", "ptk")))
+
+peeks.ao.bf <- anovaBF(g1.n.peeks ~ game.type.f + n.options.f + option.sd.f,
+                     data = subset(participants, game.type %in% c("pak", "ptk") & is.finite(g1.n.peeks)), 
+                     whichModels = "top")
+                     
+peeks.lm.bf <- lmBF(g1.n.peeks ~ game.type.f + n.options.f + option.sd.f,
+                     data = subset(participants, game.type %in% c("pak", "ptk") & is.finite(g1.n.peeks)))
+
+peeks.lm.bf.post <- posterior(peeks.lm.bf, iterations = 1e5)
+
+
+peeks.bf.df <- extractBF(peeks.ao.bf)
+row.names(peeks.bf.df) <- NULL
+peeks.bf.df$Factor <- c("Game Type x Options X SD",
+                      "Game Type x SD",
+                      "SD x Options",
+                      "Options x Game Type",
+                      "Game Type",
+                      "SD",
+                      "Options"
+                      )
+
+peeks.bf.df <- peeks.bf.df[,c(5, 1)]
+peeks.bf.df[,2] <- 1 / peeks.bf.df[,2]
+
+peeks.bf.df$bf.text[peeks.bf.df$bf > 1000] <- "BF > 1000"
+peeks.bf.df$bf.text[peeks.bf.df$bf < 1] <- "BF < 1"
+peeks.bf.df$bf.text[peeks.bf.df$bf <= 1000] <- paste("BF =", round(peeks.bf.df$bf[peeks.bf.df$bf <= 1000], 0))
+
+pak.v.ptk.hdi <- hdi.text.fun(unlist(as.data.frame(peeks.lm.bf.post)["game.type.f-pak"] - as.data.frame(peeks.lm.bf.post)["game.type.f-ptk"]),
+                            calculate = F, wordy = T)
+
+@
+
+
+<<echo = F, results='asis'>>=
+my.fun <- function(x) {return(
+  
+  paste(round(mean(x), 2), " [", round(betabinom.hdi(x)$lb, 2), ", ", round(betabinom.hdi(x)$ub, 2), "]", sep = "")
+  
+  
+  
+)}
+
+peek.rate.df <- subset(actions, game.type != "k") %>% 
+  group_by(game.type, n.options, option.sd) %>%
+  summarise(
+    text = my.fun(mode == "peek")
+  )
+
+names(peek.rate.df) <- c("Game Type", "N Options", "Option SD", "Mean Peek Rate")
+
+peek.rate.df$Environment <- rep(1:4, times = 2)
+
+peek.rate.df <- peek.rate.df[,c(1, 5, 2, 3, 4)]
+
+peek.rate.x <- xtable(peek.rate.df, 
+                               caption = "Sample mean and 95\\% Highest Density Intervals of peeking rates across environmental conditions", 
+                               label = "table:peekdf")
+
+print(peek.rate.x, include.rownames = F,
+      sanitize.text.function = function(x){x},  
+      floating.environment = getOption("xtable.floating.environment", "table*"))
+
+
+@
+
+
+\begin{itemize}
+
+  \item We found a credible effect of game type on number of peeks (\Sexpr{peeks.bf.df$bf.text[peeks.bf.df$Factor == "Game Type"]}: players playing PTK peeked fewer times than those playing PAK (mean difference = \Sexpr{pak.v.ptk.hdi}).
+
+  \item In PAK, peeking rates are highest in the first 10 trials. After the 10th trial, peeking rates do not change substantially over time.
+  
+  \item In PTK, peeking rates start much higher than in PAK. In the first trial block of PTK, the mean peeking rate was \Sexpr{betabinom.hdi(subset(actions, game.type == "ptk" & trial10.cut == "(0,10]")$mode == "peek")$text}. In contrast in PAK the mean peeking rate was credibly lower at \Sexpr{betabinom.hdi(subset(actions, game.type == "pak" & trial10.cut == "(0,10]")$mode == "peek")$text}. However, in contrast to PAK, peeking rates decreased dramatically in PTK over time.
+
+
+\end{itemize}
+
+% create peekrates.pdf
+<<echo = F, message = F, results = 'hide'>>=
+# --------------------------------
+# Peek Rate by condition
+# peeks over time.pdf
+# --------------------------------
+
+pdf("figures/peekrates.pdf", width = 8, height = 4)
 
 par(mfrow = c(1, 2))
 
-par(mar = c(5, 0, 4, 1))
+for(peek.cond.i in c("pak", "ptk")) {  
+  
+  par(mar = c(5, 5, 4, 2))
+    
+    data <- actions
+    data$trial.cut <- cut(data$trial, seq(0, 100, 10))
+    
+    plot(1, xlim = c(1, 10), ylim = c(0, .6), type = "n", 
+         xlab = "",
+         main = "", xaxt = "n", cex.lab = 1.5, yaxt = "n", ylab = "")
+    
+    
+    if(peek.cond.i == "pak") {mtext("Peeks AND Keeps", 3, line = 1, cex = 1.5)}
+    if(peek.cond.i == "ptk") {mtext("Peeks THEN Keeps", 3, line = 1, cex = 1.5)}
+    
+    mtext("Trial Block", 1, line = 2.7, cex = 1.5)
+    mtext("10 Trials per Block", 1, line = 3.7, cex = .8)
 
-beanplot(pk.p$p.peeks[pk.p$condition.mode == "peek"], 
-         col = lapply(c(1, 2, 1, 2), function(x) {col.vec[x]}),
-         main = "Participant level peek rates",
-         xlab = "Peek rate",horizontal = T
-         )
+    mtext("p(Peek)", 2, line = 3.5, cex 
+          = 1.5)
+    
+    axis(2, at = seq(0, 1, .1), 
+         labels = paste(seq(0, 100, 10), "%", sep = ""), 
+         las = 1)
+    
+    #  mtext("Bars are 95\\% HDIs", side = 3)
+    
+    col.vec <- piratepal("google")
+    
+    rect(-100, -100, 100, 100, col = gray(.99))
+    
+    abline(h = seq(0, .6, .2), col = gray(.9), lwd = 2)
+    abline(h = seq(.1, .7, .2), col = gray(.9), lwd = 1)
+    abline(v = 1:10, col = gray(.9), lwd = 1)
+    
+    legend("topright", 
+           paste("Env", 1:4), 
+           lty = 1, col = col.vec, lwd = 3, bg = "white", cex = .6)
+    
+    rect.min <- .4
+    rect.max <- .6
+    locations <- c(4, 5, 6, 7)
+    rect.width <- .7
+    
+    
+    rect(3.5, .38, 7.5, .55, col = gray(level = 1, alpha = .7), border = "black")
 
-# Peek rate by trial block
+      for(i in 1:4) {
+        
+        if(peek.cond.i == "pak") {adj <- 8}  
+        if(peek.cond.i == "ptk") {adj <- 0}  
+        
+        binom.hdi <- actions %>%
+          filter(conditionNr.c == adj + i) %>%
+          mutate(
+            trial.cut = cut(trial, breaks = seq(0, 100, 10)),
+            peek = mode == "peek"
+          ) %>%
+          group_by(trial.cut) %>%
+          summarise(
+            lb = betabinom.hdi(vec = peek)$lb,
+            ub = betabinom.hdi(vec = peek)$ub
+          )
+        
+        
+        agg <- aggregate(mode == "peek" ~ trial.cut, data = subset(data, conditionNr.c == adj + i), FUN = mean)
+        
+        lines(agg[,1], agg[,2], col = col.vec[i], lwd = 3)
+        
+        polygon(c(1:10, 10:1), c(binom.hdi$lb, rev(binom.hdi$ub)), 
+                col = transparent(col.vec[i], trans.val = .9), border = NA)
+        
+        overall <- betabinom.hdi(subset(actions, conditionNr.c == adj + i)$mode == "peek")
+        
+        # Add overall bin
+        
+        rect(locations[i] - rect.width / 2, 
+             rect.min, 
+             locations[i] + rect.width / 2,
+             rect.min + overall$mode * (rect.max - rect.min),
+             col = col.vec[i])
+        
+        text(locations[i], rect.min + overall$mode * (rect.max - rect.min), paste(round(overall$mode, 2) * 100, "%", sep = ""), pos = 3, cex = .6)
+        # segments(locations[i] + .5, rect.min + overall$lb * (rect.max - rect.min), 
+        #          locations[i] + .5, rect.min + overall$ub * (rect.max - rect.min), col = col.vec[i], lwd = 2)
+        
+        
+      }
+  
+    axis(side = 1, labels = 1:10, at = 1:10, cex.axis = .9)
+    text(5.5, .52, "All Blocks", cex = .8)
+    
+  }
+  
+  dev.off()
+
+@
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/peekrates.pdf}
+\caption{Mean peeking rates by trial block (groups of 10 trials) separated by environmental condition. The plot on the left is for PAK (Peeks and Keeps). The plot on the right is for PTK (Peeks then Keeps).}
+\label{fig:peekstime}
+\end{figure}
+
+
+%\section{Peek Rates and Earnings}
+<<echo = F, eval = F>>=
+
+par(mfrow = c(1, 2))
+
+col.vec <- piratepal("google", length.out = 4, trans = .1)
+
+for(game.type.i in c("pak", "ptk")) {
+  
+  plot(1, xlim = c(1, 100), ylim = c(-500, 500), type = "n", main = game.type.i, 
+       bty = "n", yaxt = "n", ylab = "Final Points")
+  axis(2, at = seq(-500, 500, 100), las = 1)
+  abline(h = seq(-500, 500, 100), lwd = c(.5, 1), col = gray(.5))
+  
+  for(env.i in 1:4) {
+    
+     data <- subset(participants, game.type == game.type.i & environment == env.i & is.finite(g1.final.points) & is.finite(g1.n.peeks))
+     with(data, points(g1.n.peeks, g1.final.points, pch = 16, col = col.vec[env.i]))
+     
+     
+     # Add simulation curve
+     
+
+       
+       sim.agg <- subset(points.agg, n.bad == condition.table$n.options[condition.table$environment == env.i] & 
+                           sd == condition.table$option.sd[condition.table$environment == env.i])
+       
+       lines(sim.agg$n.peeks, sim.agg$total.points.mean, col = col.vec[env.i], lwd = 3)
+       
+     }
+     
+     
+     
+     # Fit quadratic regression line
+     
+#      quadloss.fun <- function(par) {
+#        
+#        a <- par[1]
+#        b <- par[2]
+#        c <- par[3]
+#        sigma <- par[4]
+#        
+#        if(sigma > 0) {
+#        
+#        lik <- dnorm(x = data$g1.final.points,
+#                     mean = a * data$g1.n.peeks ^ 2 + b * data$g1.n.peeks + c,
+#                     sd = sigma
+#                     )
+#        
+#        loglik <- log(lik)
+#        dev <- -2 * sum(loglik)
+#        
+#        }
+#        
+#        if(sigma <= 0) {dev <- 99999999}
+#        
+#        
+# 
+#        
+#        return(dev)
+#        
+#      }
+#        
+#      result <- optim(c(0, 0, 0, 100), fn = quadloss.fun, hessian = T)  
+#      final.par <- result$par
+#      
+#      
+#      curve(final.par[1] * x^2 + final.par[2] * x + final.par[3], add = T, col = col.vec[env.i])
+#        
+     
+     
+  }
+  
+
+@
+
+\subsection{Trial-level}
+
+% p(Peek | Many variables)
+<<echo = F, message = F, results = 'hide'>>=
+actions$peek.log <- actions$mode == "peek"
+actions$last.outcome.pos.log <- actions$option.prior.outcome > 0
+actions$option.prior.mean.pos.log <- actions$option.prior.mean > 0
+
+whenpeek.mod <- MCMCglmm(peek.log ~ trials.since.last.samp + 
+                            last.outcome.pos.log + 
+                            option.prior.mean.pos.log + trial, 
+                 family = "categorical",
+                 data = subset(actions, 
+                               game.type == "pak" & 
+                                 is.finite(trials.since.last.samp) &
+                                 is.finite(last.outcome.pos.log) &
+                                 is.finite(option.prior.mean.pos.log)),
+                 nitt = 1e4
+                   )
+@
+
+In order to determine which factors were credibly correlated with the probability of peeking for participants in the Peeks and Keeps condition, we conducted a Bayesian Logistic regression analysis at the trial level. The dependent variable was a binary coded variable with a 1 indicating that the player had peeked that trial, and a 0 indicating that the player had keeped. We entered four fixed independent variables in the regression. The first two variables were time based: trial, the current trial number, and temporal distance - the number of trials since the player had last sampled from the option. The second two independent variables were a function of prior outcomes from the sampled option: prior mean positive - a binary variable with a 1 indicating that the option's prior sample mean was positive and 0 otherwise, and prior outcome positive - a binary variable with a 1 indicating that the option's prior outcome was positive.
+
+\begin{itemize}
+
+% p(Peek | Last outcome valence)
+<<echo = F, message = F, results = 'hide'>>=
+
+# What is the probability of peeking given the last outcome valence from that option?
+
+p.peek.g.pos <- with(subset(actions, game.type == "pak" & option.prior.outcome > 0), mean(mode == "peek", na.rm = T))
+
+p.peek.g.neg <- with(subset(actions, game.type == "pak" & option.prior.outcome < 0), mean(mode == "peek", na.rm = T))
+
+p.peek.mod <- compare.Coins(
+  
+  Heads.A = with(subset(actions, game.type == "pak" & option.prior.outcome > 0), sum(mode == "peek", na.rm = T)),
+  Flips.A = with(subset(actions, game.type == "pak" & option.prior.outcome > 0), sum(mode %in% c("peek", "keep"), na.rm = T)),
+   Heads.B = with(subset(actions, game.type == "pak" & option.prior.outcome < 0), sum(mode == "peek", na.rm = T)),
+  Flips.B = with(subset(actions, game.type == "pak" & option.prior.outcome < 0), sum(mode %in% c("peek", "keep"), na.rm = T))
+)
+  
+@
+
+% p(Peek | Temporal Distance plot)
+
+<<echo = F, results = "hide">>=
+
+pdf("figures/peekdistance.pdf", width = 8, height = 5)
+
+
+get.binom <- function(x, output) {
+  
+  if(output == "lb") {  return(betabinom.hdi(x, alpha.prior = 1, beta.prior = 1, na.rm = T)$lb)}
+  if(output == "ub") {  return(betabinom.hdi(x, alpha.prior = 1, beta.prior = 1, na.rm = T)$ub)}
+  
+}
+
+peek.distance.df <- actions %>%
+  subset(game.type == "pak") %>%
+  group_by(trials.since.last.samp) %>%
+  summarise(
+    freq = n(),
+    p.peek = mean(mode == "peek", na.rm = T),
+    lb = get.binom(mode == "peek", output = "lb"),
+    ub = get.binom(mode == "peek", output = "ub")
+  )
+
+plot(1, xlim = c(1, 15), ylim = c(0, .6), 
+     type = "n", xaxt = "n", xlab = "Temporal Distance",
+     ylab = "p(Peek)")
+axis(side = 1, at = 1:15)
+
+rect(-1000, -1000, 1000, 1000, col = gray(.96))
+
+abline(h = seq(0, 1, .1), lwd = c(1, 2), col = gray(1))
+abline(v = 1:15, col = gray(1), lwd = c(1, 2))
+
+abline(h = .5)
+
+
+with(peek.distance.df,
+     points(trials.since.last.samp, 
+            p.peek, 
+            cex = (freq) ^ .2,
+            pch = 21,
+            bg = "white"
+            )
+     )
+
+with(peek.distance.df, segments(trials.since.last.samp, lb, trials.since.last.samp, ub))
+
+dev.off()
+
+@
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/peekdistance.pdf}
+\caption{Mean peeking rates by temporal distance - the number of trials since the selected option was last observed by the participant - across all participants in the Peeks and Keeps conditions. The size of the symbols are an increasing function of the relative frequency of observations in the dataset. The segments indicate 95\% HDIs.}
+\label{fig:peeksdistance}
+\end{figure}
+
+
+
+\item We begin with the time based variables. There were credible partial effect of both trial and temporal distance on peek rates. Players were credibly less likely to peek on later trials than earlier trials (\Sexpr{hdi.text.fun(whenpeek.mod$Sol[,5], calculate = F, wordy = T)}), and were credibly more likely to peek as temporal distance increased (\Sexpr{hdi.text.fun(whenpeek.mod$Sol[,2], calculate = F, wordy = T)}) (See Figure \ref{fig:peeksdistance}. In other words, the longer it had been since a player had sampled an option, the more likely it is that he/she peeked. For example, when temporal distance was 2, the mean peek rate was \Sexpr{round(mean(subset(actions, game.type == "pak" & trials.since.last.samp == 2)$mode == "peek", na.rm = T), 2) * 100}\%, compared to a mean peek rate of \Sexpr{round(mean(subset(actions, game.type == "pak" & trials.since.last.samp == 10)$mode == "peek", na.rm = T), 2) * 100}\% when the temporal distance was 10.
+
+
+ \item Now we move to the outcome based variables. Participants were credibly more likely to peek at an option when the last outcome observed from that option was negative (\Sexpr{round(p.peek.g.neg, 2) * 100}\%, 95\% HDI: [\Sexpr{round(p.peek.mod$Summary$quantiles[3,1], 2) * 100}, \Sexpr{round(p.peek.mod$Summary$quantiles[3,5], 2) * 100}\%]) than when it was positive (\Sexpr{round(p.peek.g.pos, 2) * 100}\%, 95\% HDI: [\Sexpr{round(p.peek.mod$Summary$quantiles[2,1], 2)*100}\%, \Sexpr{round(p.peek.mod$Summary$quantiles[2,5], 2) * 100}\%], 95\% HDI of difference: [\Sexpr{round(p.peek.mod$Summary$quantiles[4,1], 2)*100}\%, \Sexpr{round(p.peek.mod$Summary$quantiles[4,5], 2)*100}\%]).
+
+
+
+\end{itemize}
+
+
+
+\section{Strategy Fitting}
+
+
+See pak_strategyfitting.R
+
+% Individual participant curves
+% pak participant curves.pdf
+<<echo = F, eval = F>>=
+# --------------------------------
+# Plot individual participant's data
+# pak participant curves.pdf
+# --------------------------------
+{
+
+
+pdf("figures/pak participant curves2.pdf", width = 12, height = 8)
+  
+worker.vec <- unique(subset(participants, game.type %in% c("pak", "ptk"))$workerid)
+
+for(i in worker.vec) {
+  
+  actions.i <- subset(actions, workerid == i)
+  
+  n.games <- length(unique(actions.i$playergamenum))
+  
+  n.options <- actions.i$n.options[1]
+      worker.name <- i
+    game.type <- actions.i$game.type[1]
+    option.sd <- actions.i$option.sd[1]
+    
+    
+  selection.ls <- vector("list", n.games)
+  outcome.ls <- vector("list", n.games)
+  action.ls <- vector("list", n.games)
+  
+  best.option.vec <- c()
+  
+  for(j in 1:n.games) {
+    
+      selection.ls[[j]] <- paste(subset(actions.i, playergamenum == j)$selection)
+      outcome.ls[[j]] <- subset(actions.i, playergamenum == j)$outcome
+      action.ls[[j]] <- paste(subset(actions.i, playergamenum == j)$mode)
+      
+      
+      option.order.i <- subset(optionorder, workerid == i & playergamenum == j)$optionorder
+      option.order.i <- as.numeric(unlist(str_split(option.order.i, ",")))
+      best.option.i <- which(option.order.i == 1)
+      best.option.vec <- c(best.option.vec, best.option.i)
+  
+  }
+      
+  if(mean(unlist(lapply(1:n.games, function(x) {length(selection.ls[[x]]) == 100}))) == 1) {
+  
+  plot.pak(
+           n.options = n.options,
+           worker.name = i,
+           game.type = game.type,
+           option.sd = option.sd,
+           selection.ls = selection.ls,
+           outcome.ls = outcome.ls,
+           action.ls = action.ls,
+           best.option.vec = LETTERS[best.option.vec],
+           col.vec = piratepal(palette = "google", trans = .3))
+  
+  }
+  
+}
+
+dev.off()
+}
+@
+
+% Participant peeks over time
+% participant peeks over time.pdf
+<<echo = F, eval = F>>=
+
 {
   
-par(mar = c(5, 5, 4, 1))  
-dat <- aggregate(peek.bin ~ condition.difficulty + condition.stability + trial.c.cut20, 
-                  data = subset(pk.r, condition.mode == "peek"), FUN = mean)
+pdf("figures/participant peeks over time.pdf", width = 16, height = 12)
 
-plot(1, xlim = c(1, 10), ylim = c(0, .5), main = "Peek Rate by Trial Block", ylab = "p(peek)", xaxt= "n", type = "n", xlab = "Trial Block")
-axis(1, at = 1:10, labels = unique(dat$trial.c.cut20))
+cond.vec <- c(1:4, 9:12)
 
-abline(v = 5.5, col = "gray", lty = 1, lwd = .5)
+col.1 <- gray(.9)
+col.2 <- "white"
+
+line.col.vec <- rep(piratepal("info")[c(1, 2, 4, 5)], 4)
+
+    my.text <- "Peek Rate"
+    cond.vec <- cond.vec <- c(1:4, 9:12)
+    layout(matrix(c(1:5, 1, 6:9, 1, 10:13, 1, 14:17), nrow = 5, ncol = 4, byrow = F), 
+           widths = rep(5, 4), heights = c(2, rep(5, 4)))
+
+  
+
+# Header plot
+  
+  par(mar = rep(0, 4))
+  
+  plot(1, type = "n", xaxt = "n", xlab = "", xlim = c(0, 1), ylim = c(0, 1), bty = "n")
+  
+  text(.5, .5, my.text,  cex = 3)
+
+  
+for(cond.i in cond.vec) {
+
+game.type.i <- condition.table$game.type[condition.table$uni.condition == cond.i]  
+n.options.i <- condition.table$n.options[condition.table$uni.condition == cond.i]
+option.sd.i <- condition.table$option.sd[condition.table$uni.condition == cond.i]
+
+data <- subset(actions, conditionNr.c == cond.i)
+data$peek.bin <- data$mode == "peek"
+
+worker.vec <- unique(data$workerid)
 
 
-with(subset(dat, condition.difficulty == "hard" & condition.stability == "stable"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[2], lwd = 2))
+# Top plot
+par(mar = c(3, 4, 4, 1) + .1)
+plot(1, xlim = c(0, 100), ylim = c(0, 1), type = "n", bty = "n", 
+     xlab = "", ylab = "p(Peek)", 
+     main = paste("Game = ", game.type.i, "\n",
+                  "N = ", n.options.i, "\n",
+                  "SD = ", option.sd.i, sep = ""
+                  ), 
+     cex.main = 1)
 
-with(subset(dat, condition.difficulty == "hard" & condition.stability == "dynamic"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[2], lty = 2, lwd = 2))
+abline(h = seq(0, 1, .1), lwd = c(1, 2), col = gray(.9))
+abline(v = seq(0, 100, 10), lwd = c(1, 2), col = gray(.9))
 
-with(subset(dat, condition.difficulty == "easy" & condition.stability == "stable"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[1], lwd = 2))
 
-with(subset(dat, condition.difficulty == "easy" & condition.stability == "dynamic"), 
-     lines(trial.c.cut20, peek.bin, col = col.vec[1], lty = 2, lwd = 2))
 
-legend("bottomright", c("Easy - Stable", "Easy - Dynamic", "Hard - Stable", "Hard - Dynamic"), 
-       col = col.vec[rep(1:2, each = 2)], 
-       lty = rep(1:2, times = 2))
+avg <- data %>%
+  group_by(trial) %>%
+  summarise(
+    peek.mean = mean(peek.bin)
+  )
+
+lines(1:100, avg$peek.mean, col = line.col.vec[cond.i], lwd = 5)
+
+mtext(paste("Mean", round(mean(data$peek.bin), 2), sep = "\n"), side = 3, at = 90, line = 1)
+
+# Bottom Plot
+
+par(mar = c(3, 4, 0, 1) + .1)
+plot(1, xlim = c(0, 100), ylim = c(0, length(worker.vec) + 2), 
+     type = "n", ylab = "", yaxt = "n", bty = "n")
+
+for(i in 1:length(worker.vec)) {
+ 
+vec <- data$peek.bin[data$workerid == worker.vec[i]]
+   
+ col.vec <- rep(col.1, 100)
+ col.vec[vec == FALSE] <- col.2
+ 
+ rect(1:100 - .5, 
+      rep(i, 100) - .5, 
+      1:100 + .5, 
+      rep(i, 100) + .5,
+      col = col.vec, border = "white", lwd = .5)
+ 
+}
+
+mtext(text = 1:length(worker.vec), at = 1:length(worker.vec), side = 2, cex = .4, las = 1)
+
+}
+
+
+dev.off()
+}
+@
+
+% Participant option switch over time
+% participant option switch over time.pdf
+<<echo = F, eval = F>>=
+
+{
+pdf("figures/participant option switch over time.pdf", width = 24, height = 12)
+
+
+col.1 <- gray(.5)
+col.2 <- "white"
+line.col.vec <- rep(piratepal("info")[c(1, 2, 4, 5)], 4)
+
+my.text <- "Option Switch Rate"
+cond.vec <- cond.vec <- c(1:4, 9:12, 5:8)
+
+layout(matrix(c(1:5, 1, 6:9, 1, 10:13, 1, 14:17, 1, 18:21, 1, 22:25), nrow = 5, ncol = 6, byrow = F), 
+       widths = rep(5, 6), heights = c(1.5, rep(5, 4)))
+
+# Header plot
+
+par(mar = rep(0, 4))
+
+plot(1, type = "n", xaxt = "n", xlab = "", xlim = c(0, 1), ylim = c(0, 1), bty = "n")
+
+text(.5, .5, my.text,  cex = 3)
+
+for(cond.i in cond.vec) {
+  
+  game.type.i <- condition.table$game.type[condition.table$uni.condition == cond.i]  
+  n.options.i <- condition.table$n.options[condition.table$uni.condition == cond.i]
+  option.sd.i <- condition.table$option.sd[condition.table$uni.condition == cond.i]
+  
+  data <- subset(actions, conditionNr.c == cond.i)
+  data$peek.bin <- data$mode == "peek"
+  
+  worker.vec <- unique(data$workerid)
+  
+  
+  # Top plot
+  par(mar = c(2, 4, 4, 1) + .1)
+  plot(1, xlim = c(0, 100), ylim = c(0, 1), type = "n", bty = "n", 
+       xlab = "", ylab = "p(Peek)", 
+       main = paste("Game = ", game.type.i, "\n",
+                    "N = ", n.options.i, "\n",
+                    "SD = ", option.sd.i, sep = ""
+       ), 
+       cex.main = 1)
+  
+  mtext(paste("Mean", round(mean(data$option.switch, na.rm = T), 2), sep = "\n"), side = 3, at = 90, line = 1)
+  
+  
+  abline(h = seq(0, 1, .1), lwd = c(1, 2), col = gray(.9))
+  abline(v = seq(0, 100, 10), lwd = c(1, 2), col = gray(.9))
+  
+
+    
+    avg <- data %>%
+      group_by(trial) %>%
+      summarise(
+        switch.mean = mean(option.switch)
+      )
+    
+    lines(1:100, avg$switch.mean, col = line.col.vec[cond.i], lwd = 5)
+    
+
+  
+  # Bottom Plot
+  
+  par(mar = c(3, 4, 0, 1) + .1)
+  plot(1, xlim = c(0, 100), ylim = c(0, length(worker.vec) + 2), 
+       type = "n", ylab = "Participants", yaxt = "n", bty = "n")
+  
+  for(i in 1:length(worker.vec)) {
+    
+
+   vec <- data$option.switch[data$workerid == worker.vec[i]]
+    
+    col.vec <- rep(col.1, 100)
+    col.vec[vec == FALSE] <- col.2
+    
+    rect(1:100 - .5, 
+         rep(i, 100) - .5, 
+         1:100 + .5, 
+         rep(i, 100) + .5,
+         col = col.vec, border = "white", lwd = .5)
+    
+  }
+  
+  mtext(text = 1:length(worker.vec), at = 1:length(worker.vec), side = 2, cex = .4, las = 1)
+  
+}
+
+
+dev.off()
 }
 
 @
-\caption{\label{fig:peekdistributions}Distributions of peeking rates by participant (left panel) or trial (right panel).}
-\end{figure}
 
-<<echo = F, eval = F>>=
-# Analyses for Peeks only condition
 
-pointsall.peeks.bmod <- MCMCglmm(total.points ~ condition.difficulty * condition.stability * n.peeks, 
-                              data = subset(pk.p, subset = condition.mode == "peek"))
+<<eval = F, echo = F>>=
 
-pointsall.demo.bmod <- MCMCglmm(total.points ~ sex + age + barratt.all + reg.sch.all + max.nen.all, 
-                                         data = subset(pk.p, 
-                                                       age %in% 16:100 & demo.valid))
+actions <- actions %>% mutate(
+  
+  last.outcome.pos = option.prior.outcome > 0,
+  last.mean.pos = option.prior.mean > 0
+  
+)
 
-pointsall.bmod <- MCMCglmm(total.points ~ sex + age + barratt.all + 
-                             reg.sch.all + max.nen.all + condition.mode + 
-                             condition.difficulty + condition.stability,
-                                data = subset(pk.p, 
-                                              age %in% 16:100 & demo.valid))
-   # Older people perform better, ps in the peek condition do worse, hard difficulty and 
-   # unstable environments do worse.
+
+plot(1, xlim = c(0, 3), ylim = c(0, 1), 
+     type = "n", xaxt = "n", ylab = "p(Peek)",
+     xlab = "Option Switch", main = "p(Peek) | Option Switch")
+
+rect(-100, -100, 100, 100, col = gray(.96))
+abline(h = seq(0, 1, .1), lwd = c(1, 2), col = "white")
+
+add.binom.p.bar(subset(actions, game.type == "pak" & option.switch == F)$mode == "peek", location = 1, bar.col = piratepal("google", length.out = 5)[1], bar.label = "Switch Option")
+
+
+add.binom.p.bar(subset(actions, game.type == "pak" & option.switch == T)$mode == "peek", location = 2, bar.col = piratepal("google", length.out = 5)[2], bar.label = "Same Option")
+
+
+
+
+plot(1, xlim = c(0, 3), ylim = c(0, 1), 
+     type = "n", xaxt = "n", ylab = "p(Peek)",
+     xlab = "Option Switch", main = "p(Peek) | Last outcome valence")
+
+rect(-100, -100, 100, 100, col = gray(.96))
+abline(h = seq(0, 1, .1), lwd = c(1, 2), col = "white")
+
+add.binom.p.bar(subset(actions, game.type == "pak" & last.outcome.pos == T)$mode == "peek", location = 1, bar.col = piratepal("google", length.out = 5)[1], bar.label = "Positive")
+
+
+add.binom.p.bar(subset(actions, game.type == "pak" & last.outcome.pos == F)$mode == "peek", location = 2, bar.col = piratepal("google", length.out = 5)[2], bar.label = "Neg")
+
+
+peek.by.trialssince <- actions %>% 
+  filter(game.type == "pak") %>%
+  group_by(trials.since.last.samp) %>%
+  summarise(
+    
+    peek.rate = mean(mode == "peek", na.rm = T),
+    n = n()
+    
+  )
+
+
+
+
+with(subset(peek.by.trialssince, trials.since.last.samp <= 30), 
+     plot(trials.since.last.samp, peek.rate, cex = log(n, base = 8), 
+          ylim = c(0, .7), pch = 21, 
+          bg = piratepal("info", trans = .5, length.out = 1),
+          xlab = "Trials since last sample",
+          ylab = "p(Peek)",
+          main = "p(Peek) | Time since last sample"
+          
+          ))
+
+abline(h = .5, lty = 2)
+
+
+
+
+
+
+
+
+
+actions <- actions %>% mutate(
+  
+  prior.mean.pos = option.prior.mean > 0,
+  prior.outcome.pos = option.prior.outcome > 0
+  
+)
+
+actions %>% filter(game.type == "pak") %>% group_by(prior.outcome.pos) %>%
+  summarise(
+    change.option = mean(option.switch, na.rm = T),
+    peek = mean(mode == "peek", na.rm = T),
+    n = n()
+    
+  )
+
+actions %>% filter(game.type == "pak") %>% group_by(prior.mean.pos) %>%
+  summarise(
+    change.option = mean(option.switch, na.rm = T),
+    peek = mean(mode == "peek", na.rm = T),
+    n = n()
+    
+  )
+
+
 
 @
 
-Next, we restricted our analyses to the peek condition. For each participant, we calculated the percentage of trials the person peeked. In Figure~\ref{fig:peekdistributions} we show the overall distribution of participant level peek rates (across experimental conditions) and the mean peek rate across participants at blocks of 20 trials. The median participant peeked on \Sexpr{round(median(pk.p.r$p.peeks[pk.p.r$condition.mode == "peek"], na.rm = T), 2) * 100}\% of trials: however there was a clear bimodal distribution of peeking rates wherein most participants either peeked either less than 10\% of trials or between 40\% and 60\% of trials. Moreover, of those participants who peeked on less than 10\% of trials.
 
-<<echo = F>>=
-peeks.cond.trial.bmod <- MCMCglmm(peek.bin ~ trial.c + condition.difficulty + condition.stability, 
-                                  random = ~workerid, data = subset(pk.r, condition.mode == "peek"),
-                                  family = "categorical", nitt = 3000, burnin = 500, verbose = F)
-# Less peeking on later trials
+\section{Study 2 (Proposed)}
 
-peeks.demo.bmod <- MCMCglmm(n.peeks ~ sex + age + barratt.all + reg.sch.all + max.nen.all, 
-                            data = subset(pk.p, 
-                                          subset = condition.mode == "peek" & demo.valid), 
-                            verbose = F)
-
-# Participant level selection and option switch rate
-
-participant.switch.bmod <- MCMCglmm(selectionswitch.mean ~ modeswitch.mean, 
-                            data = subset(pk.p.r, 
-                                          subset = condition.mode == "peek"), 
-                            verbose = F)
-@
-
-To see which variables affected peeking rates, we conducted a Bayesian binary logistic regression with peeks at the trial level as the dependent variable, experimental conditions and trial as between-subject independent variables. We found a credible negative effect of trial number suggesting that people are less likely to peek on later trials \Sexpr{hdi.text.fun(peeks.cond.trial.bmod$Sol[,2], calculate = F, digits = 3)}. There were no other credible effects\footnote{Men were credibly less likely to peek than women: \Sexpr{hdi.text.fun(peeks.demo.bmod$Sol[,2], calculate = F, digits = 2)}}.
-
-How did option switching relate to mode switching? If the two variables are unrelated, then selection switching may be completely unrelated to exploration. However, if the two are perfectly related, then the two measures might be psychologically equivalent. To test this, we correlated the each participant's option switching rate with their mode switching rate. The correlation was positive and credibly different from 0 %%% Fix this:: (\Sexpr{hdi.text.fun(participant.switch.bmod$Sol[,2], calculate = T)})
-
-\begin{figure}
-\centering
-<<fig.width = 5, fig.height = 5, echo = F>>=
-with(subset(pk.p.r, condition.mode == "peek"), 
-     plot(selectionswitch.mean, modeswitch.mean, xlab = "Option Switch Rate", 
-          ylab = "Mode Switch Rate", pch = 16, col = gray(.3, .6))
-     )
-
-abline(lm(modeswitch.mean ~ selectionswitch.mean,
-          data = subset(pk.p.r, condition.mode == "peek")))
-@
-\caption{\label{fig:switchingcor}Distributions of peeking rates by participant (left panel) or trial (right panel).}
-\end{figure}
-
-\subsection{The effect of observation on rewards}
-
-%% Note!!! This regression analysis definitely violates the homoskedasticity assumption. We may need to replace it with a robust analysis
-
-<<echo = F>>=
-peeks.points.mod <- MCMCglmm(total.points ~ n.peeks * condition.stability * condition.difficulty,
-                 data = subset(pk.p.r, condition.mode == "peek"), verbose = F)
-@
-
-To see how peeks affected point totals, we regressed each participant's total points earned on the interaction between the number of peeks they took and the stability and difficulty experimental conditions. We found a credible negative interaction between the number of peeks a person took and the stability condition (\Sexpr{hdi.text.fun(peeks.points.mod$Sol[,5], calculate = F, digits = 2)}), suggesting that in the stable environment, as peeks increased a person's total points decreased. The effect in the dynamic environment was negative but not credibly different from 0 (\Sexpr{hdi.text.fun(peeks.points.mod$Sol[,2], calculate = F, digits = 2)}). These relationships are shown in Figure~\ref{fig:peeksandpoints}.
-
-\begin{figure}
-\centering
-<<fig.width = 5, fig.height = 5, echo = F>>=
-plot(1, xlim = c(0, 1), ylim = c(-500, 1000), type = "n", xlab = "Peeking Percentage", ylab = "Total Points Earned")
-
-with(subset(pk.p.r, condition.mode == "peek" & condition.stability == "stable"), points(p.peeks, total.points, pch = 16, col = gray(.2, .6)))
-
-with(subset(pk.p.r, condition.mode == "peek" & condition.stability == "dynamic"), points(p.peeks, total.points, pch = 16, col = "red"))
-
-abline(lm(total.points ~ p.peeks, 
-          data = subset(pk.p.r, condition.mode == "peek" & condition.stability == "stable")))
-
-abline(lm(total.points ~ p.peeks, 
-          data = subset(pk.p.r, condition.mode == "peek" & condition.stability == "dynamic")), col = "red")
-
-legend('topright', c("stable", "dynamic"), 
-       col = c(gray(.2, .6), "red"),
-       pch = c(16, 16), lty = c(1, 1)
-       )
-
-@
-\caption{\label{fig:peeksandpoints}Relationship between number of peeks and point totals separately for the dynamic and static experimental conditions. Note To Authors: These data definitely violate homoskedasticity assumptions of linear regression.}
-\end{figure}
+\subsection{Design}
 
 
+Changes from first study
 
-\subsection{Option and Mode Switching}
+\begin{itemize}
 
-<<echo = F>>=
-selswitch.bmod <- MCMCglmm(selectionswitch.mean ~  barratt.all + reg.sch.all + max.nen.all,
-                               data = subset(pk.p, 
-                                             subset = demo.valid), verbose = F)
+  \item Increase number of participants per cell (100 each = 600 participants).
+  \item Participants are given complete information about environments prior to game. Then we can argue for 'optimal' behavior.
+  \item Players play 3 games. Points are summed over all games and converted to a bonus. This should motivate people to maximize earnings -- and minimize losses -- in each game.
+  \item Get rid of really easy (n = 2, sd = 5) and really difficult (n = 4, sd = 20) conditions.
+  
 
-modeswitch.bmod <- MCMCglmm(modeswitch.mean ~  barratt.all + reg.sch.all + max.nen.all,
-                               data = subset(pk.p, 
-                                             subset = demo.valid & condition.mode == "peek"), verbose = F)
+\end{itemize}
 
-peeks.bmod <- MCMCglmm(p.peeks ~  barratt.all + reg.sch.all + max.nen.all,
-                               data = subset(pk.p, 
-                                             subset = demo.valid & condition.mode == "peek"), verbose = F)
-@
+Between-Subjects (9 conditions)
 
-Did the three personality measures of impulsivity, regret, and maximizing affect search behavior?
-We regressed each participant's mean option switching rate and mean mode switching rate (for participants in the peeks condition) on the three personality measures. For option switching, we found credible positive effects for impulsivity (\Sexpr{hdi.text.fun(selswitch.bmod$Sol[,2], calculate = F, digits = 2)}) and regret (\Sexpr{hdi.text.fun(selswitch.bmod$Sol[,3], calculate = F, digits = 2)}), suggesting that the more impulsive and regretful a person was, the more likely they were to change options during search. For mode switching, we found a credible positive effect of maximizing (\Sexpr{hdi.text.fun(modeswitch.bmod$Sol[,4], calculate = F, digits = 2)}), suggesting that the more maximizing a person was the more likely they were to change between peeking and keeping states\footnote{We also conducted a similar regression analysis with each person's total percentage of peeks as the dependent variable. None of the effects were credibly different from 0.}.
+Game (3)
 
+\begin{itemize}
 
+  \item Game Type (Keeps, Peeks and Keeps, Peeks Then Keeps)
 
+\end{itemize}
 
+Environments (3)
+
+\begin{itemize}
+
+  \item N.Options (2, 3, 4)
+  \item Option SD (10)
+
+\end{itemize}
+
+Within-Subjects (3)
+
+N-Games (3)
 
 
 
@@ -1752,8 +1938,6 @@ We regressed each participant's mean option switching rate and mean mode switchi
 
 \section{Conclusion}
 
-
-\break
 
 \section{Appendix}
 

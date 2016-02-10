@@ -12,24 +12,28 @@ library(dplyr)
 
 # Set parameters
 
-n.sim <- 5000   # Number of simulations for each parameter combination
+n.sim <- 2000   # Number of simulations for each parameter combination
 n.trials <- 100 # Number of total trials in game
 good.mean <- 5
 bad.mean <- -5
 
 peeks.vec <- seq(0, 100, 5)
 n.good.vec <- 1
-n.bad.vec <- 1:4  # 1:4
-sd.vec <- c(5, 10, 20, 30) # 0 means random sd from 1 to 30
-keep.select.strategy.vec <- "egreedy.05" # egreedy or softmax 
+n.bad.vec <- c(1, 3)  # 1:4
+sd.vec <- c(5, 10, 20) # 0 means random sd from 1 to 30
+keep.select.strategy.vec <- c(paste("egreedy-", c(".05"), sep = ""))
+
+action.strategy.vec <- c("trial", "expectation")
+
 peek.select.strategy.vec <- "uniform"
-update.method.vec <- "mean"   #c("rl.3", "mean"),  # mean or rl.3
+update.method.vec <- c("mean")   #c("rl.3", "mean"),  # mean or rl.3
 
 environments.df <- expand.grid(n.good = n.good.vec,
                                n.bad = n.bad.vec,
                                sd = sd.vec, 
                                keep.select.strategy = keep.select.strategy.vec,
                                peek.select.strategy = peek.select.strategy.vec,
+                               action.strategy = action.strategy.vec,
                                update.method = update.method.vec,
                                stringsAsFactors = F
 )
@@ -46,11 +50,12 @@ for(env.i in 1:nrow(environments.df)) {
   keep.select.strategy.i <- environments.df$keep.select.strategy[env.i]
   peek.select.strategy.i <- environments.df$peek.select.strategy[env.i]
   update.method.i <- environments.df$update.method[env.i]
+  action.strategy.i <- environments.df$action.strategy[env.i]
   
   peeks.sim <- expand.grid(
     n.trials = n.trials,
     n.peeks = peeks.vec,
-    action.strategy = c("trial"),
+    action.strategy = action.strategy.i,
     peek.select.strategy = peek.select.strategy.i,# uniform, egreedy or softmax
     keep.select.strategy = keep.select.strategy.i,
     update.method = update.method.i,
@@ -68,7 +73,7 @@ for(env.i in 1:nrow(environments.df)) {
   peek.sim.fun <- function(i) {
     
     # Print current run
-    sfCat(paste("Iteration ", i, "out of ", nrow(peeks.sim)), sep="\n")
+ #   sfCat(paste("Iteration ", i, "out of ", nrow(peeks.sim)), sep="\n")
     
     soft.max <- function(exp.vec, trial, sens = 1) {
       
@@ -171,7 +176,7 @@ for(env.i in 1:nrow(environments.df)) {
           
           if(substr(peek.select.strategy.i, 1, 2) == "eg") {
             
-            e.par <- as.numeric(substr(peek.select.strategy.i, 8, 10))
+            e.par <- as.numeric(substr(peek.select.strategy.i, 9, 11))
             
             select.probs <- egreedy(current.expectations, 
                                      trial = trial.i, 
@@ -180,9 +185,11 @@ for(env.i in 1:nrow(environments.df)) {
           }
           
           
-          if(peek.select.strategy.i == "softmax") {
+          if(substr(peek.select.strategy.i, 1, 2) == "so") {
             
-            select.probs <- soft.max(current.expectations, trial = trial.i, sens = 1)
+            sm.par <- as.numeric(substr(peek.select.strategy.i, 9, 12))
+            
+            select.probs <- soft.max(current.expectations, trial = trial.i, sens = sm.par)
             
           }
           
@@ -190,15 +197,17 @@ for(env.i in 1:nrow(environments.df)) {
         
         if(current.action == "keep") {
           
-          if (keep.select.strategy.i == "softmax") {
+          if (substr(keep.select.strategy.i, 1, 2) == "so") {
             
-            select.probs <- soft.max(current.expectations, trial = trial.i, sens = 1)
+            sm.par <- as.numeric(substr(keep.select.strategy.i, 9, 12))
+            
+            select.probs <- soft.max(current.expectations, trial = trial.i, sens = sm.par)
             
           }
           
           if(substr(keep.select.strategy.i, 1, 2) == "eg") {
             
-            e.par <- as.numeric(substr(keep.select.strategy.i, 8, 10))
+            e.par <- as.numeric(substr(keep.select.strategy.i, 9, 11))
             
             select.probs <- egreedy(current.expectations, 
                                      trial = trial.i, 
@@ -234,9 +243,11 @@ for(env.i in 1:nrow(environments.df)) {
           
         }
         
-        if(keep.select.strategy.i == "softmax") {
+        if(substr(keep.select.strategy.i, 1, 2) == "so") {
           
-          select.probs <- soft.max(current.expectations, trial = trial.i, sens = 1)
+          sm.par <- as.numeric(substr(keep.select.strategy.i, 9, 12))
+          
+          select.probs <- soft.max(current.expectations, trial = trial.i, sens = sm.par)
           
         }
         
@@ -358,6 +369,8 @@ for(env.i in 1:nrow(environments.df)) {
     n.peek.best <- sum(agent.result$selection == best.option & agent.result$action == "peek")
     p.select.best <- mean(agent.result$selection == best.option)
     
+    print(c(i, total.points))
+    
     return(c(total.points, 
              final.impression.mad, 
              final.prefer.best, 
@@ -371,6 +384,9 @@ for(env.i in 1:nrow(environments.df)) {
     
   }
 
+  result <- c()
+  for(i in 1:nrow(peeks.sim)) {result <- c(result, peek.sim.fun(i)[1])}
+  
   
   sfInit(parallel = T, cpus = 32, slaveOutfile = "slaveupdate.txt")
   sfExport("peeks.sim")
@@ -378,7 +394,7 @@ for(env.i in 1:nrow(environments.df)) {
   
   # Run simulation!
   date() # Print starting time
-  cluster.result <- sfClusterApplySR(x = 1:nrow(peeks.sim), fun = peek.sim.fun, perUpdate = 1)
+ cluster.result <- sfClusterApplySR(x = 1:nrow(peeks.sim), fun = peek.sim.fun, perUpdate = 1)
   cluster.result.r <- matrix(unlist(cluster.result), nrow = nrow(peeks.sim), ncol = 10, byrow = T)
   
   # Append to peeks.sim
@@ -419,13 +435,15 @@ for(env.i in 1:nrow(environments.df)) {
   }
   
   points.agg <- peeks.sim %>%
-    group_by(n.bad, sd, n.peeks) %>%
+    group_by(n.bad, sd, n.peeks, action.strategy, peek.select.strategy, keep.select.strategy, update.method) %>%
     summarise(
       total.points.mean = mean(total.points),
       final.impression.mad.mean = mean(final.impression.mad),
-      final.peek.impression.mad = mean(final.peek.impression.mad, na.rm = T),
-      final.peek.prefer.best.mean = mean(final.peek.prefer.best, na.rm = T),
-      first.keep.points.mean = mean(first.keep.points),
+ #     final.peek.impression.mad = mean(final.peek.impression.mad, na.rm = T),
+#      final.peek.prefer.best.mean = mean(final.peek.prefer.best, na.rm = T),
+#      first.keep.points.mean = mean(first.keep.points),
+      mean.0 = mean(total.points == 0),
+      mean.100 = mean(total.points == 100),
       n = n()
     )
   

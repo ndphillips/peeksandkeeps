@@ -1,7 +1,3 @@
-  
-% ------------------------
-% DB and Confidence Science Manuscript
-% ------------------------
 
 %\documentclass{nature,floatsintext}
 
@@ -62,7 +58,6 @@
 \usepackage{graphicx}
 \usepackage{rotating}
 \usepackage{pdfpages}
-%\usepackage{Sweave}
 \usepackage{subcaption}
 \usepackage{float}
 
@@ -80,10 +75,30 @@
 
 
 
+
+% Custom R Functions
+
+
+
 \maketitle
 
 \section*{Introduction}
 
+One day in the 1980s, a man named Martin Frankel walked into a stock broker's office in Toledo Ohio and said he wanted to invest in the stock market. Frankel explained to the owner of the office that after studying the market for years, he had develoepd a unique insight into the market -- to the point where he was cetain he could beat it. The owner was so impressed by Frankel's vision that he actually hired Frankel as a trader. Over the next 6 months, Frankel all-but lived at the broker's office -- meticulously studying the market and developing increasingly ingenious trade ideas. However, after 6 months, the owner became increasingly frustrated with Frankel. Despite all of his `brilliant' theories and plans, Frankel never actually \textit{acted} on any of his theories by making a trade. By his own admission, Frankel suffered from what he called `trader's block' wherein he had a hard time `pulling the trigger.' Because of his lack of action, Frankel was fired from the small broker's office \footnote{Frankel's story would have been forgotten if not for the fact that he  went on to earn over $200 Million dollars in a series of investment scams and Ponzi schemes. He is currently serving a XX year prison sentence.}.
+
+Why did Frankel fail as a legitimate broker? On the one hand, patience is a virtue -- one that Frankel had in spades. If Frankel had acted more impulsively and invested all of the firm's money in one `hot' stock on his first day, he would may been fired for putting the entire firm at risk on too little knowledge. Instead, Frankel's failure as a legitimate stock broker exemplifies the cost of waiting too long to act.
+
+This example exemplifies a common trade-off between acquiring information without risk, and acting on existing information with risk. This trade-off occurs in many areas of life. 
+
+\begin{itemize}
+
+\item Mate Selection: A person must decide how long to get to know someone via dating before committing to a long-term relationship. Too little dating could lead to marring a poor match, while waiting too long could lead to no marriage at all.
+
+\item Food Foraging: 
+
+\item Athletic training: How long should I train in boxing before I schedule my first real match?
+
+\end{itemize}
 
 
 \subsection{Exploration-exploitation trade-off}
@@ -93,8 +108,6 @@ Many of the most important real world decisions require individuals to reap cons
 This conflict between obtaining new information and acting on existing information is known as the exploration-exploitation trade-off. The exploration-exploitation (EE) trade-off is one of the most widely studied aspects of decision making from human to non-human organisms. The exploration-exploitation trade-off represents a goal conflict in decisions under uncertainty, where an organism is trying to maximize its long term rewards from \textit{a priori} unknown options. On the one hand, individuals want to explore options by gaining as much information as possible to improve the quality of their future decisions. On the other hand, they want to \textit{exploit} options by acting on existing information in order to increase short-term rewards.
 
 One of the most widely used experimental tasks used to study the exploration-exploitation conflict is the n-armed bandit. In an n-armed bandit, participants have a fixed number of trials to select an option and experience a consequential reward.
-
-
 
 
 \subsection{Purely epistemic versus pragmatic actions}
@@ -149,7 +162,6 @@ In order to study how people alternate between explicit exploration and exploita
 Peeks and Keeps is an extension of an N-armed bandit task that explicitly separates exploration and exploitation decisions. In the task, participants repeatedly select one of N options with \textit{a priori} unknown underlying probability distributions over the course of M trials. On each trial, the participant selects an option and elects to either \textit{observe} the next outcome without financial feedback, or \textit{bet} on the outcome and receive the financial feedback. At the end of M trials, the participant is paid the sum of all sample outcomes revealed on bet trials. If he always observes and never bets, he receives no bonus. If he bets on every trial, he receives the sum total of all samples.
 
 
-
 \section{``Optimal'' Search in Peeks and Keeps}
 
 How many peeks \textit{should} people take when playing peeks and keeps? The answer to this question depends on two critical criteria: the specific search strategy a person uses, and the statistical environment they are in. With regards to search strategies, 
@@ -181,10 +193,6 @@ We varied three parameters in our simulation, one at the agent level, and two at
 
 We had 5,000 agents play the game for each parameter combination. In Figure~\ref{fig:optimal}, we plot the environments and the median number of points earned by 5,000 agents using 0 to 100 peeks:
 
-
-
-
-
 % Plot optimal peeks simulation
 
 
@@ -196,8 +204,8 @@ We had 5,000 agents play the game for each parameter combination. In Figure~\ref
 \end{figure}
 
 
-% latex table generated in R 3.1.3 by xtable 1.7-4 package
-% Sun Oct  4 10:58:15 2015
+% latex table generated in R 3.2.2 by xtable 1.7-4 package
+% Thu Nov 19 23:09:01 2015
 \begin{table*}[ht]
 \centering
 \begin{tabular}{rrrrrrr}
@@ -227,57 +235,151 @@ n.bad & sd & npeeks & max.points & peek.MAID & peek.PB & end.MAID \\
 \end{table*}
 
 
-The optimal number of peeks and their associated expected point earnings for each environment is presented in Table~\ref{table:optimalsim1}. Here, we see that as both the number of bad options and standard deviation of option outcomes increases, the optimal number of peeks increases. In the easiest environment, with 1 negative option and an option standard deviation of 5, the optimal number of peeks is 0 leading to an expected earning of 441.4381054 points. This suggests that this environment is so easy to learn that peeking is unecessary, and even detrimental. In contrast, in the most difficult environment, with 3 negative outcomes and an option standard deviation of 30, the optimal number of peeks is 20 leading to an expected earning of 131.0950805 points.
-
-\subsection{Required learning in each environment}
-
-How much learning is necessary in each environment? To answer this, we calculated how well agents using the optimal number of peeks learned their environments. We defined learning with two measures: mean absolute impression deviation (MAID), the mean absolute difference between agent's impressions of options and the option's true EV, and prefer best (PB), the probability that, at the end of its peeking trials, the agent preferred the best option. 
+The optimal number of peeks and their associated expected point earnings for each environment is presented in Table~\ref{table:optimalsim1}. Here, we see that as both the number of bad options and standard deviation of option outcomes increases, the optimal number of peeks increases. In the easiest environment, with 1 negative option and an option standard deviation of 5, the optimal number of peeks is 0 leading to an expected earning of 441.4381054 points. This suggests that this environment is so easy to learn that peeking is unnecessary, and even detrimental. In contrast, in the most difficult environment, with 3 negative outcomes and an option standard deviation of 30, the optimal number of peeks is 20 leading to an expected earning of 131.0950805 points.
 
 
+%' \subsection{Required learning in each environment}
+%' 
+%' How much learning is necessary in each environment? To answer this, we calculated how well agents using the optimal number of peeks learned their environments. We defined learning with two measures: mean absolute impression deviation (MAID), the mean absolute difference between agent's impressions of options and the option's true EV, and prefer best (PB), the probability that, at the end of its peeking trials, the agent preferred the best option. 
+%' 
+%' <<eval = F, echo = F>>=
+%' 
+%' # Load and aggregated simulations
+%'   
+%' date.to.use <- "oct 3 2015"
+%' 
+%' 
+%' {
+%'   
+%' files.to.use  <- list.files(paste("simulations/", date.to.use, " learning", sep = ""))
+%' files.to.use <- files.to.use[grepl("result", files.to.use)]
+%' 
+%' 
+%' for(i in 1:length(files.to.use)) {
+%'   
+%'   current.df <- read.table(paste("simulations/", date.to.use, " learning/", files.to.use[i], sep = ""), 
+%'                            stringsAsFactors = F, 
+%'                            header = T, 
+%'                            sep = "\t")
+%'   
+%'   if(i == 1) {peeks.sim <- current.df}
+%'   if(i > 1) {peeks.sim <- rbind(peeks.sim, current.df)}
+%'   
+%' }
+%' 
+%' ## Aggegate data
+%' learning.agg <- peeks.sim %>%
+%'   group_by(n.bad, sd, n.peeks) %>%
+%'   summarise(
+%'     final.impression.mad.mean = mean(final.impression.mad),
+%'     final.peek.prefer.best.mean = mean(final.peek.prefer.best, na.rm = T),
+%'     n = n()
+%'     )
+%' 
+%' 
+%' write.table(learning.agg, paste("simulations/", date.to.use, " learning/", date.to.use, " agg.txt", sep = ""), sep = "\t")
+%' }
+%' 
+%' 
+%' @
+%' 
+%' <<echo = F, message = F, prompt = F>>=
+%' 
+%' date.to.use <- "oct 3 2015"
+%' 
+%' learning.agg <- read.table(paste("simulations/", date.to.use, " learning/", date.to.use, " learning agg.txt", sep = ""), sep = "\t")
+%' 
+%' 
+%' pdf("figures/optimal_result_learning.pdf", width = 11, height = 5)
+%' {
+%' n.bad.vec <- sort(unique(learning.agg$n.bad))
+%' sd.vec <- sort(unique(learning.agg$sd))
+%' 
+%' par(mfrow = c(1, 4))
+%' par(mar = c(3, 5, 5, 1))
+%' 
+%'   for(sd.i in 1:length(sd.vec)) {
+%'     
+%'     plot(1, 
+%'          xlim = c(-5, 100), 
+%'          ylim = c(0, 1), 
+%'          type = "n",
+%'          ylab = "p(prefer good option)",
+%'          xlab = "Number of peeking trials",
+%'          main = paste("sd = ", sd.vec[sd.i], sep = ""),
+%'          cex.main = 1
+%'          )
+%'     
+%'     mtext("Pos ~ N(5, sd), Neg ~ N(-5, sd)", side = 3, line = .2, cex = .5)
+%'     
+%'     rect(-10000, -1000, 10000, 10000, col = gray(.95))
+%'     
+%'     abline(h = seq(0, 1, .1), col = gray(1), lwd = 1.5)
+%'     abline(h = seq(.05, 1.05, .1), col = gray(1), lwd = .75)
+%'     
+%'     abline(v = seq(0, 100, 10), col = gray(1), lwd = 1.5)
+%'     abline(v = seq(50, 150, 10), col = gray(1), lwd = .75)
+%'     
+%'     abline(h = 0)
+%'     
+%'     legend("bottomright",
+%'            paste("N neg = ", n.bad.vec, sep = ""),
+%'            pch = 16,
+%'            col = col.vec,
+%'            lty = 1
+%'            )
+%'     
+%'     
+%'   for(n.bad.i in 1:length(n.bad.vec)) {
+%'     
+%'     data <- subset(learning.agg, n.bad == n.bad.vec[n.bad.i] & sd == sd.vec[sd.i])
+%'     
+%'     
+%'     lines(data$n.peeks, 
+%'           data$final.peek.prefer.best.mean, 
+%'           col = col.vec[n.bad.i], type = "b", pch = 16)
+%'     
+%' #     optimal.peeks <- min(data$n.peeks[data$total.points.mean == max(data$total.points.mean)])
+%' #     optimal.points <- max(data$total.points.mean)
+%' #     
+%' #     points(optimal.peeks, optimal.points, pch = 21, cex = 1.5)
+%' #     text(optimal.peeks, 
+%' #          optimal.points, 
+%' #          labels = paste(optimal.peeks, ", ", round(optimal.points, 0), sep = ""), 
+%' #          pos = 3)
+%'     
+%'  
+%' 
+%' }
+%' 
+%' }
+%' 
+%' dev.off()
+%' }
+%' 
+%' 
+%' @
+%' 
+%' 
+%' \begin{figure}
+%' \centering
+%' \includegraphics[width=6in]{figures/optimal_result_learning.pdf}
+%' \caption{\label{fig:learning}Aggregate results from agent-based sampling simulation. learning results.}
+%' \end{figure}
+%' 
 
 
 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## pdf 
-##   2
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+% Load Data
 
 
 
 
 
-\begin{figure}
-\centering
-\includegraphics[width=6in]{figures/optimal_result_learning.pdf}
-\caption{\label{fig:learning}Aggregate results from agent-based sampling simulation. learning results.}
-\end{figure}
 
 
-
-
-% Custom Functions
-
-
-% Load Datafiles
-
-
-% Create dataframes
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## NULL
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
-
-
+% Plotting and analysis functions
 
 
 
@@ -286,139 +388,202 @@ How much learning is necessary in each environment? To answer this, we calculate
 
 \subsection{Participants}
 
-Participants (N = 250) were recruited from the Amazon Mechanical Turk\footnote{We restricted our study to workers who had completed at least 100 HITs with at least a 95\% HIT acceptance rate.}. For their paritcipation, workers received a guaranteed reward of 50 cents with the possibility of a bonus up to \$1.00. 122 (49\%) were female and the mean age was (35.66) (IQR: [27, 42])
+Participants (N = 361) were recruited from the Amazon Mechanical Turk\footnote{We restricted our study to workers who had completed at least 100 HITs with at least a 95\% HIT acceptance rate.}. For their participation, workers received a guaranteed reward of 50 cents with the possibility of a bonus up to \$1.00. 156 (43\%) were female and the mean age was (34.43) (IQR: [28, 39])
 
 \subsection{Procedure}
 
-We created 6 sequences of 200 integers following a rounded Normal distribution with means of -5, 0 or +5 (corresponding to the positive, neutral, and negative options) and standard deviation of 10 or 30 (corresponding to the easy and difficult distributions)\footnote{In order to ensure that the sample distributions closely matched the desired means and standard deviations, we repeatedly generated candidate sample distributions until we found ones whose sample means were within 0.10 of the desired mean and whose standard deviations were within 1.0 of the desired value. Additionally, we truncated the distributions so the minimum and maximum values did not exceed -99 and +99 respectively.}. In the \textit{dynamic} condition, the location of the positive and negative options changed places on trial 101, while in the \textit{stable} condition there was no change. To prevent any option order counfounds, we employed all 6 possible orderings of the options on the screen as a between-subjects factor. However, for all of our analyses we have ignored this factor.
+We created four different environments by crossing two factors: Number of options (2 v. 4), and Option standard deviation (5 v. 20)\footnote{In order to ensure that the sample distributions closely matched the desired means and standard deviations, we repeatedly generated candidate sample distributions until we found ones whose sample means were within 0.10 of the desired mean and whose standard deviations were within 1.0 of the desired value. Additionally, we truncated the distributions so the minimum and maximum values did not exceed -99 and +99 respectively.}. The four environments are displayed in Figure \ref{fig:distributions}. The order of options was randomized for each participant.
 
-Each participant was randomly assigned to one of the 48 conditions (Response Mode (Peeks vs. Keeps) x Stimuli Difficulty (Easy vs. Hard) x Environment Stability (Stable vs. Dynamic) x Option Order). In both response mode conditions, participants were told that the goal of the game was to earn as many points as possible over the course of 200 trials using their 200 Keeps (for the Keeps condition) or their 200 Peeks and Keeps (for the Peeks condition). To reinforce the idea that peeking introduces an opportunity cost, Those in the Peeks condition were specifically told that using a Peek action would `use a trial.' Participants were not explicitly told that the options would be either stable or dynamic. Instead, all participants were told that at any given point in the game, one of the options would be the best one.
+% distributions.pdf
 
-After completing all 200 trials, participants completed three personality questionnaires (the XX, YYY, and the ZZZ) and an additional post-study questionnaire that elicited their overall impressions of the game.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/distributions.pdf}
+\caption{4 decision environments used in Study 1. Each environment has one good option (in blue) with a positive expected value of +5. All other (bad) options have a negative expected value of -5.}
+\label{fig:distributions}
+\end{figure}
+
+
+Each participant was randomly assigned to one of the 12 conditions (Response Mode (K v. PAK v. PTK) x Environment (1 v 2 v 3 v 4). In all response mode conditions, participants were told that the goal of the game was to earn as many points as possible over the course of 100 trials. To reinforce the idea that peeking introduces an opportunity cost, Those in the Peeks condition were specifically told that using a Peek action would `use a trial.'
+
+After completing the first game, participants were spontaneously given a new game to play. They were told that the options in the second game were identical to those in the first game, but that the location of the options would be randomly shuffled. Participants completed three personality questionnaires (the XX, YYY, and the ZZZ) and an additional post-study questionnaire that elicited their overall impressions of the game.
 
 \section{Results}
 
-\subsection{Point Totals}
+\subsection{Final Points}
+
+Distributions of final points values across all games are presented in Figure \ref{fig:pointbeans}.
+
+% pointbeans.pdf
+
+
 
 \begin{figure}
-\centering
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-1} 
-
-\end{knitrout}
-\caption{\label{fig:pointsbytrial}Cumulative point tradjectories across trials for all conditions and participants. The two panels in the top row show the average cumulative point values across participants for each experimental condition. The bottom 8 plots in the bottom two rows show the mean tradjectory of each condition separately, with individual lines plotted for each individual participant.}
+\includegraphics[width=\columnwidth]{figures/pointbeans}
+\caption{Distributions of final points earned by participants in each decision environment and experimental condition. Median point values are indicated by the dark black lines and are printed above each distribution.}
+\label{fig:pointbeans}
 \end{figure}
 
+To see which game and environmental factors affected point totals, we calculated a Bayesian ANOVA using the BayesFactor package in R.
 
-Summary statistics of the cumulative point totals earned by participants in each of the experimental conditions are shown in Table~\ref{table:MeasuresTbl}. Additionally, group mean and individual level cumulative point values across trials are shown in Figure~/ref{fig:pointsbytrial}. To see which experimental variables affected point totals, we conducted a Bayesian regression analysis with each participant's point total as the dependent variable and the three experimental conditions as independent variables. Results are shown in Table~\ref{table:totals.model}. We found a credible negative effect of the difficult stimuli condition for both trials 1-100 and trials 101-200, suggesting that participants did worse in the difficult environment than the easy environment. For trials 101-200 we found that participants in the dynamic condition performed credibly worse than those in the stable condition.
 
-% Regression model HDIs
-% latex table generated in R 3.1.3 by xtable 1.7-4 package
-% Sun Oct  4 10:58:38 2015
+
+We entered both decision environment and game type as fixed factors\footnote{Because performance was so poor across all game types in environment 4, we elected to withdraw these data from the ANOVA. When we include these data, the effect of game type does not appear (BF = 0.14)}. We found credible effects for the option environment (BF > 1000, E1--E2 = 226.07, 95\% HDI [177.32, 273.68], E1--E3 = 110.08, 95\% HDI [66.61, 154.71], E2--E3 = 110.08, 95\% HDI [66.61, 154.71]). Critically, we found a credible effect of game.type (BF =  3: players playing PTK earned more points than those playing K (mean difference = 31.36, 95\% HDI [-12.25, 74.3]) and those playing PAK (mean difference = 66.35, 95\% HDI [21.31, 110.97]). However, there was no credible difference between PAK and K conditions (mean difference = -34.99, 95\% HDI [-79.69, 8.97]). While the raw data appeared to reflect an interaction between environment and game type on points earned, the Bayes Factor for the interaction was 0.08 indicating slight support for the null hypothesis.
+
+\subsection{Peeking Rates}
+
+Next, we focused on the two peeking conditions. We sought to answer three questions: First, how do the overall rates of peeking differ between PAK and PTK and how does peeking change over time? Second, how do environmental factors affect peeking rates? Third, in the PAK condition, how does peeking change over time? Finally, What is the relationship between option switching and peeking? 
+
+\subsubsection{Participant-level}
+
+To see how the overall rates of peeking differed between peeking conditions, we calculated the average rate of peeking across participants at each game trial. Results are in Figure~\ref{fig:peekstime} and average peeking rates across trials are presented in Table~\ref{table:peekdf}.
+
+
+
+
+% latex table generated in R 3.2.2 by xtable 1.7-4 package
+% Thu Nov 19 23:09:20 2015
 \begin{table*}[ht]
 \centering
-\begin{tabular}{llll}
+\begin{tabular}{lrrrl}
   \hline
-Condition & Trials 1 - 100 & Trials 101 - 200 & All Trials \\ 
+Game Type & Environment & N Options & Option SD & Mean Peek Rate \\ 
   \hline
-Mode = Peek & -33 [-70, 17] & -34 [-81, 14] & -62 [-133, 9] \\ 
-  Difficulty = Hard & -109 [-153, -74] & -58 [-111, -11] & -171 [-244, -111] \\ 
-  Stability = Stable & 30 [-4, 77] & 132 [81, 179] & 171 [112, 247] \\ 
+pak &   1 &   2 &   5 & 0.17 [0.16, 0.18] \\ 
+  pak &   2 &   2 &  20 & 0.2 [0.18, 0.21] \\ 
+  pak &   3 &   4 &   5 & 0.18 [0.17, 0.19] \\ 
+  pak &   4 &   4 &  20 & 0.22 [0.21, 0.23] \\ 
+  ptk &   1 &   2 &   5 & 0.07 [0.06, 0.07] \\ 
+  ptk &   2 &   2 &  20 & 0.08 [0.07, 0.08] \\ 
+  ptk &   3 &   4 &   5 & 0.06 [0.06, 0.07] \\ 
+  ptk &   4 &   4 &  20 & 0.14 [0.13, 0.15] \\ 
    \hline
 \end{tabular}
-\caption{Posterior means and 95\% highest density intervals of the effects of experimental conditions on point totals.} 
-\label{table:totals.model}
+\caption{Sample mean and 95\% Highest Density Intervals of peeking rates across environmental conditions} 
+\label{table:peekdf}
 \end{table*}
 
 
 
-% Cumulative point total table
-% latex table generated in R 3.1.3 by xtable 1.7-4 package
-% Sun Oct  4 10:58:58 2015
-\begin{table*}[ht]
-\centering
-\begin{tabular}{llllll}
-  \hline
-Mode & Difficulty & Stability & Trials 1-100 & Trials 101-200 & All Trials \\ 
-  \hline
-keep & easy & dynamic & 181, [120, 243] & 33, [-25, 96] & 211, [119, 320] \\ 
-  keep & easy & stable & 203, [159, 256] & 239, [168, 306] & 445, [334, 553] \\ 
-  keep & hard & dynamic & 26, [-84, 124] & 17, [-70, 104] & 45, [-82, 179] \\ 
-  keep & hard & stable & 71, [-1, 149] & 142, [56, 249] & 206, [68, 346] \\ 
-  peek & easy & dynamic & 158, [104, 206] & -21, [-72, 21] & 118, [49, 182] \\ 
-  peek & easy & stable & 112, [63, 155] & 172, [99, 250] & 285, [178, 380] \\ 
-  peek & hard & dynamic & 22, [-59, 93] & 48, [-62, 148] & 66, [-58, 188] \\ 
-  peek & hard & stable & 154, [52, 247] & 61, [-21, 149] & 194, [51, 326] \\ 
-   \hline
-\end{tabular}
-\caption{Sample means and 95\% highest density intervals of cumulative point values earned by participants within a specified trial range.} 
-\label{table:MeasuresTbl}
-\end{table*}
+\begin{itemize}
+
+  \item We found a credible effect of game type on number of peeks (BF > 1000: players playing PTK peeked fewer times than those playing PAK (mean difference = 12.52, 95\% HDI [8.65, 16.51]).
+
+  \item In PAK, peeking rates are highest in the first 10 trials. After the 10th trial, peeking rates do not change substantially over time.
+  
+  \item In PTK, peeking rates start much higher than in PAK. In the first trial block of PTK, the mean peeking rate was 0.54 (95\% HDI = [0.52, 0.56]). In contrast in PAK the mean peeking rate was credibly lower at 0.33 (95\% HDI = [0.31, 0.35]). However, in contrast to PAK, peeking rates decreased dramatically in PTK over time.
 
 
-\subsection{Observation Rates}
+\end{itemize}
+
+% create peekrates.pdf
+
 
 \begin{figure}
-\centering
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-15-1} 
+\includegraphics[width=\columnwidth]{figures/peekrates.pdf}
+\caption{Mean peeking rates by trial block (groups of 10 trials) separated by environmental condition. The plot on the left is for PAK (Peeks and Keeps). The plot on the right is for PTK (Peeks then Keeps).}
+\label{fig:peekstime}
+\end{figure}
 
-\end{knitrout}
-\caption{\label{fig:peekdistributions}Distributions of peeking rates by participant (left panel) or trial (right panel).}
+
+%\section{Peek Rates and Earnings}
+
+
+\subsection{Trial-level}
+
+% p(Peek | Many variables)
+
+
+In order to determine which factors were credibly correlated with the probability of peeking for participants in the Peeks and Keeps condition, we conducted a Bayesian Logistic regression analysis at the trial level. The dependent variable was a binary coded variable with a 1 indicating that the player had peeked that trial, and a 0 indicating that the player had keeped. We entered four fixed independent variables in the regression. The first two variables were time based: trial, the current trial number, and temporal distance - the number of trials since the player had last sampled from the option. The second two independent variables were a function of prior outcomes from the sampled option: prior mean positive - a binary variable with a 1 indicating that the option's prior sample mean was positive and 0 otherwise, and prior outcome positive - a binary variable with a 1 indicating that the option's prior outcome was positive.
+
+\begin{itemize}
+
+% p(Peek | Last outcome valence)
+
+
+% p(Peek | Temporal Distance plot)
+
+
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figures/peekdistance.pdf}
+\caption{Mean peeking rates by temporal distance - the number of trials since the selected option was last observed by the participant - across all participants in the Peeks and Keeps conditions. The size of the symbols are an increasing function of the relative frequency of observations in the dataset. The segments indicate 95\% HDIs.}
+\label{fig:peeksdistance}
 \end{figure}
 
 
 
-Next, we restricted our analyses to the peek condition. For each participant, we calculated the percentage of trials the person peeked. In Figure~\ref{fig:peekdistributions} we show the overall distribution of participant level peek rates (across experimental conditions) and the mean peek rate across participants at blocks of 20 trials. The median participant peeked on 32\% of trials: however there was a clear bimodal distribution of peeking rates wherein most participants either peeked either less than 10\% of trials or between 40\% and 60\% of trials. Moreover, of those participants who peeked on less than 10\% of trials.
+\item We begin with the time based variables. There were credible partial effect of both trial and temporal distance on peek rates. Players were credibly less likely to peek on later trials than earlier trials (-0.01, 95\% HDI [-0.01, 0]), and were credibly more likely to peek as temporal distance increased (0.05, 95\% HDI [0.04, 0.06]) (See Figure \ref{fig:peeksdistance}. In other words, the longer it had been since a player had sampled an option, the more likely it is that he/she peeked. For example, when temporal distance was 2, the mean peek rate was 33\%, compared to a mean peek rate of 42\% when the temporal distance was 10.
+
+
+ \item Now we move to the outcome based variables. Participants were credibly more likely to peek at an option when the last outcome observed from that option was negative (29\%, 95\% HDI: [28, 30\%]) than when it was positive (12\%, 95\% HDI: [12\%, 13\%], 95\% HDI of difference: [15\%, 18\%]).
 
 
 
-To see which variables affected peeking rates, we conducted a Bayesian binary logistic regression with peeks at the trial level as the dependent variable, experimental conditions and trial as between-subject independent variables. We found a credible negative effect of trial number suggesting that people are less likely to peek on later trials -0.002, [-0.003, -0.002]. There were no other credible effects\footnote{Men were credibly less likely to peek than women: -18.49, [-35.5, -0.19]}.
-
-How did option switching relate to mode switching? If the two variables are unrelated, then selection switching may be completely unrelated to exploration. However, if the two are perfectly related, then the two measures might be psychologically equivalent. To test this, we correlated the each participant's option switching rate with their mode switching rate. The correlation was positive and credibly different from 0 %%% Fix this:: (0.48, [0.48, 0.49])
-
-\begin{figure}
-\centering
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-18-1} 
-
-\end{knitrout}
-\caption{\label{fig:switchingcor}Distributions of peeking rates by participant (left panel) or trial (right panel).}
-\end{figure}
-
-\subsection{The effect of observation on rewards}
-
-%% Note!!! This regression analysis definitely violates the homoskedasticity assumption. We may need to replace it with a robust analysis
+\end{itemize}
 
 
 
-To see how peeks affected point totals, we regressed each participant's total points earned on the interaction between the number of peeks they took and the stability and difficulty experimental conditions. We found a credible negative interaction between the number of peeks a person took and the stability condition (-3.44, [-6.56, -0.57]), suggesting that in the stable environment, as peeks increased a person's total points decreased. The effect in the dynamic environment was negative but not credibly different from 0 (-0.88, [-3.06, 1.43]). These relationships are shown in Figure~\ref{fig:peeksandpoints}.
-
-\begin{figure}
-\centering
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-20-1} 
-
-\end{knitrout}
-\caption{\label{fig:peeksandpoints}Relationship between number of peeks and point totals separately for the dynamic and static experimental conditions. Note To Authors: These data definitely violate homoskedasticity assumptions of linear regression.}
-\end{figure}
+\section{Strategy Fitting}
 
 
+See pak_strategyfitting.R
 
-\subsection{Option and Mode Switching}
+% Individual participant curves
+% pak participant curves.pdf
 
 
+% Participant peeks over time
+% participant peeks over time.pdf
 
-Did the three personality measures of impulsivity, regret, and maximizing affect search behavior?
-We regressed each participant's mean option switching rate and mean mode switching rate (for participants in the peeks condition) on the three personality measures. For option switching, we found credible positive effects for impulsivity (0, [0, 0.01]) and regret (0.01, [0, 0.01]), suggesting that the more impulsive and regretful a person was, the more likely they were to change options during search. For mode switching, we found a credible positive effect of maximizing (0.01, [0, 0.02]), suggesting that the more maximizing a person was the more likely they were to change between peeking and keeping states\footnote{We also conducted a similar regression analysis with each person's total percentage of peeks as the dependent variable. None of the effects were credibly different from 0.}.
+
+% Participant option switch over time
+% participant option switch over time.pdf
 
 
 
 
+
+
+\section{Study 2 (Proposed)}
+
+\subsection{Design}
+
+
+Changes from first study
+
+\begin{itemize}
+
+  \item Increase number of participants per cell (100 each = 600 participants).
+  \item Participants are given complete information about environments prior to game. Then we can argue for 'optimal' behavior.
+  \item Players play 3 games. Points are summed over all games and converted to a bonus. This should motivate people to maximize earnings -- and minimize losses -- in each game.
+  \item Get rid of really easy (n = 2, sd = 5) and really difficult (n = 4, sd = 20) conditions.
+  
+
+\end{itemize}
+
+Between-Subjects (9 conditions)
+
+Game (3)
+
+\begin{itemize}
+
+  \item Game Type (Keeps, Peeks and Keeps, Peeks Then Keeps)
+
+\end{itemize}
+
+Environments (3)
+
+\begin{itemize}
+
+  \item N.Options (2, 3, 4)
+  \item Option SD (10)
+
+\end{itemize}
+
+Within-Subjects (3)
+
+N-Games (3)
 
 
 
@@ -431,8 +596,6 @@ We regressed each participant's mean option switching rate and mean mode switchi
 
 \section{Conclusion}
 
-
-\break
 
 \section{Appendix}
 
